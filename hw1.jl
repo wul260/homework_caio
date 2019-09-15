@@ -17,7 +17,7 @@ D = inv((A'*A))*b
 E = [repeat(vec(A),3)[i] * repeat(b, inner=(9,1))[i] for i=1:27]
 E = sum(E)
 F = A[1:2, 1:2]
-x = b'/A
+x = A\b
 
 # Ex 4
 [A zeros(3,12);
@@ -38,18 +38,20 @@ for i in 1:15
 end
 
 # Ex 6
+# using Pkg
 # Pkg.add("DataFrames")
 # Pkg.add("CSV")
+# Pkg.add("LinearAlgebra")
 using CSV
 using DataFrames
 using LinearAlgebra
-data = CSV.read("Homework/Homeworks/hw1/datahw1.csv", header=false)
+data = CSV.read("/home/caio/Homework/Homeworks/hw1/datahw1.csv", header=false)
 data = dropmissing(data)
 n = nrow(data)
 X = [ones(n) data[:,3] data[:,4] data[:,6]]
 Y = data[:, 5]
-b = inv(X'*X)*(X'*Y)
-e = Y - X*b
-sigma = e'*e/(n - 4)
-Sigma = sigma*inv(X'*X)
-sd = diag(Sigma).^(1/2)
+β = inv(X'X)*(X'Y)
+ε = Y - X*β
+σ_ε = ε'*ε/(n - 4)
+σ_β = σ_ε*inv(X'X)
+sd = diag(σ_β).^(1/2)
