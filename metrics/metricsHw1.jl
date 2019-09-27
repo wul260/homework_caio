@@ -5,9 +5,11 @@ using DataFrames
 using Dates
 using Optim
 using CSV
-using Gadfly, Cairo, Fontconfig
+using Gadfly
+# , Cairo, Fontconfig
 
-theme = Theme(line_width = 2pt, minor_label_font_size = 16pt)
+theme = Theme(major_label_font_size = 24pt, minor_label_font_size=14pt, line_width = 3px,
+              background_color = "white", key_position = :none, panel_stroke = "black")
 # Exercise 1:
 MSE = function(β, b)
   β_bar = mean(β, dims=1)
@@ -60,23 +62,29 @@ end
 
 resStack = stack(res, [:SBias, :SBias2])
 p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, 
-         Geom.bar(position = :dodge), Guide.title("MSE"),
-         Guide.xlabel(nothing), Guide.ylabel(nothing),
-         Theme(major_label_font_size = 24pt, minor_label_font_size=16pt, background_color = "white",
-              key_position = :none));
-p
-p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
+         Geom.bar(position = :dodge), Guide.title("Bias"),
+         Guide.xlabel(nothing), Guide.ylabel(nothing), theme);
+# p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
 draw(SVG("Ex1 - NEW - Bias100.svg", 30cm, 15cm), p)
 
 resStack = stack(res, [:Var, :Var2])
-p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
-p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
-draw(PNG("Ex1 - Var100.png", 30cm, 15cm), p)
+p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, 
+         Geom.bar(position = :dodge), Guide.title("Variance of θ hat"),
+         Guide.xlabel(nothing), Guide.ylabel(nothing),
+         Theme(major_label_font_size = 24pt, minor_label_font_size=16pt, background_color = "white",
+              key_position = :none));
+# p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
+draw(SVG("Ex1 - NEW - Var100.svg", 30cm, 15cm), p)
 
 resStack = stack(res, [:MSE, :MSE2])
-p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
-p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
-draw(PNG("Ex1 - MSE1000.png", 30cm, 15cm), p)
+p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable,
+         Geom.bar(position = :dodge), Guide.title("MSE"),
+         Guide.xlabel(nothing), Guide.ylabel(nothing), theme);
+draw(SVG("Ex1 - NEW - MSE100.svg", 30cm, 15cm), p)
+p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable,
+         Geom.bar(position = :dodge), Guide.title("MSE - n = 1000"),
+         Guide.xlabel(nothing), Guide.ylabel(nothing), theme);
+draw(SVG("Ex1 - NEW - MSE1000.svg", 30cm, 15cm), p)
 # Bias rise with the number of intruments, Variance descreses, Mean Square Error increses.
 
 #Exercise 2
@@ -162,11 +170,10 @@ y = θ .+ log.(u)
 
 mlefun(θ) = -sum(log.(f.(exp.(y .- θ))))
 optimize(mlefun, 0, 10)
-x = 0:0.5:15; z = -mlefun.(x)
+x = 0:0.1:5; z = -mlefun.(x)
 p = plot(x = x, y = z, Geom.line, Guide.xticks(ticks=collect(x)),
-         Guide.xlabel(nothing), Guide.ylabel(nothing),
-         Theme(line_width = 2pt, minor_label_font_size = 16pt));
-draw(PNG("mle.png", 30cm, 15cm), p)
+         Guide.xlabel("θ"), Guide.ylabel("MLE value"), theme)
+draw(SVG("Ex3 - NEW - mle.svg", 30cm, 15cm), p)
 
 # Criteria function has no maximum or minimun, maximization goes to upper bound
 # We can modify it to solve the problem:
@@ -179,27 +186,26 @@ optimize(mlefun, 0, 10)
 data = CSV.read("ass1q42.csv", header=false)
 names!(data, [:x, :y])
 
-p = plot(data, x=:x, y=:y, Guide.xticks(ticks=collect(0:25:400)), Guide.yticks(ticks=collect(13:24)),
-         Guide.xlabel(nothing), Guide.ylabel(nothing),
-         Theme(line_width = 2pt, minor_label_font_size = 16pt));
-draw(PNG("Cloud.png", 30cm, 15cm), p)
+p = plot(data, x=:x, y=:y, Guide.xticks(ticks=collect(0:50:400)), Guide.yticks(ticks=collect(13:24)),
+         Guide.xlabel("x"), Guide.ylabel("y"), theme)
+draw(SVG("Ex4 - NEW - Cloud.svg", 30cm, 15cm), p)
 p = plot(data, x=:y, Geom.histogram(bincount = 12), Guide.xticks(ticks=collect(13:25)),
-         Guide.xlabel(nothing), Guide.ylabel(nothing),
-         Theme(line_width = 2pt, minor_label_font_size = 16pt));
-draw(PNG("Ex4-y.png", 30cm, 15cm), p)
+         Guide.xlabel("y"), Guide.ylabel("frequency"), theme)
+draw(SVG("Ex4 - NEW - Y frequency.svg", 30cm, 15cm), p)
 p = Plot[]
 for i in 13:24 
   push!(p, plot(data[data.y .== i, :], x=:x, Geom.histogram(bincount=406), 
-                Guide.xlabel(string("y = ", i)),
-                Guide.xticks(ticks=collect(0:25:406)),
-                Guide.yticks(ticks=collect(1:3))));
+                Guide.xlabel(nothing), Guide.ylabel(nothing), 
+                Guide.title(string("Y = ", i)),
+                Guide.xticks(ticks=collect(0:50:400)),
+                Guide.yticks(ticks=collect(1:2)),
+                Theme(major_label_font_size = 12pt, panel_stroke = "black")));
 end
 p2 = plot(data, x = :x, Geom.histogram(bincount=400),
-          Guide.xticks(ticks=collect(0:25:400)));
-t = vstack(p2, gridstack(reshape(p, 4,3)), Theme(background_color = "white"));
-img = PNG("Ex4-x.PNG", 34cm,40cm)
-import Cairo, Fontconfig
-draw(img, t)
+                Guide.xlabel(string("x")), Guide.ylabel("frequency"), 
+                Guide.xticks(ticks=collect(0:50:400)), theme);
+t = vstack(p2, gridstack(reshape(p, 4,3)));
+draw(SVG("Ex4 - NEW - X frequency.svg", 34cm,40cm), t)
 
 function f(x,p)
   if x in 14:23
@@ -247,7 +253,6 @@ for y in 13:24
 
   push!(res4, [y up pg1 pg0])
 end
-res4
 
 let
 i = 0
@@ -325,17 +330,20 @@ sim = function(σ)
     o = optimize(x->mle(x, data), [125 125 1.0]) 
     θ[r,:] = Optim.minimizer(o) 
   end
-  smse = sqrt(sum(MSE(θ, [λ₀ β₀ σ]')[7:9]))
+  smse = sqrt.(MSE(θ, [λ₀ β₀ σ]')[7:8])
   return smse
 end
 
 σ = 0.1:0.1:2
 smse = sim.(σ)
-smse = load("smse.jld", "smse")
+x = [smse[i][1] for i in 1:length(smse)]
+y = [smse[i][2] for i in 1:length(smse)]
+res7c = DataFrame(σ = σ, λ = x, β = y) 
+res7c = stack(res7c, [:λ, :β])
 
-using Plots;
-plot(collect(σ), smse);
-savefig("Ex7.png");
+p = plot(res7c, x = :σ, y = :value, color = :variable,
+     Geom.line, Guide.ylabel("SMSE"), theme)
+draw(SVG("Ex7 - NEW - SMSE.svg", 30cm, 15cm), p)
 
 # Exercise 8
 
@@ -345,13 +353,15 @@ f(x, y) = φ(x)*φ(y)*(1 - 0.5*(1 - 2*Φ(x))*(1 - 2*Φ(y)))
 x = -2:0.02:2
 y = -2:0.02:2
 z = f.(x,y)
+using Plots
 Plots.scalefontsizes(2)
-plot(x,y,f, st=:surface, c = :blues, size = (1400, 1080));
-savefig("3dplot.png")
+plot3d(x,y,f, st=:surface, c = :blues)
+savefig("Ex 8 - 3d.png")
 
 zy0 = f.(x,0)
-plot(x, zy0, size = (1400, 1080));
-savefig("zy0.png")
+p = plot(x = x, y = zy0, Geom.line,
+         Guide.title("Y = 0"), theme);
+draw(SVG("Ex8 - NEW - given y0", 30cm, 15cm), p)
 zy1 = f.(x,1)
 plot(x, zy1, size = (1400, 1080));
 savefig("zy1.png")
