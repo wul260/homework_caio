@@ -291,22 +291,26 @@ data = nothing
 
 function mle(param, data)
   λ,β,σ = param
-  A = (1+σ/λ^2)*(1+σ/β^2);
-  if log(A) < 0  
+  if σ < 0
     return Inf
   else
-    B = log(sqrt(log(A)));
-    E = (λ/sqrt(1+σ/λ^2))*(β/sqrt(1+σ/β^2))
-    if E < 0
+    A = (1+σ/λ^2)*(1+σ/β^2);
+    if log(A) < 0  
       return Inf
     else
-      C = (log.(data) .- log(E)).^2
-      D = 2*log(A);
-      return sum(B .+ C/D);
+      B = log(sqrt(log(A)));
+      E = (λ/sqrt(1+σ/λ^2))*(β/sqrt(1+σ/β^2))
+      if E < 0
+        return Inf
+      else
+        C = (log.(data) .- log(E)).^2
+        D = 2*log(A);
+        return sum(B .+ C/D);
+      end
     end
   end
 end
-
+mle([0.59107 12.81572 -0.85277])
 
 o = optimize(x->mle(x, data), [200 300 200.0]) 
 res = Optim.minimizer(o)
@@ -314,14 +318,15 @@ mle([170.9453, 94.7704, 1.1637])
 
 # c
 sim = function(σ)
+  print(σ)
   λ₀ = 150
   β₀ = 100
   θ = zeros(1000, 3)
   for r in 1:1000
     μ_l = log(λ₀) - 1/2*σ 
     μ_b = log(β₀) - 1/2*σ
-    s_l = log(σ/λ₀^2 + 1)
-    s_b = log(σ/β₀^2 + 1)
+    s_l = log(σ/λ₀ + 1)
+    s_b = log(σ/β₀ + 1)
 
     n = 1000
     a = rand(LogNormal(μ_l + μ_b, s_l + s_b), n)
@@ -330,11 +335,13 @@ sim = function(σ)
     o = optimize(x->mle(x, data), [125 125 1.0]) 
     θ[r,:] = Optim.minimizer(o) 
   end
+  println(mean(θ, dims =1))
   smse = sqrt.(MSE(θ, [λ₀ β₀ σ]')[7:8])
+  println(smse)
   return smse
 end
 
-σ = 0.1:0.1:2
+σ = 0.1:0.3:10
 smse = sim.(σ)
 x = [smse[i][1] for i in 1:length(smse)]
 y = [smse[i][2] for i in 1:length(smse)]
@@ -342,7 +349,10 @@ res7c = DataFrame(σ = σ, λ = x, β = y)
 res7c = stack(res7c, [:λ, :β])
 
 p = plot(res7c, x = :σ, y = :value, color = :variable,
-     Geom.line, Guide.ylabel("SMSE"), theme)
+         Geom.line, Guide.ylabel("SMSE"),
+         Guide.colorkey(""),
+         Theme(key_label_font_size = 14pt, panel_stroke = "black",
+              background_color = "white"))
 draw(SVG("Ex7 - NEW - SMSE.svg", 30cm, 15cm), p)
 
 # Exercise 8
@@ -353,24 +363,29 @@ f(x, y) = φ(x)*φ(y)*(1 - 0.5*(1 - 2*Φ(x))*(1 - 2*Φ(y)))
 x = -2:0.02:2
 y = -2:0.02:2
 z = f.(x,y)
+
 using Plots
 Plots.scalefontsizes(2)
 plot3d(x,y,f, st=:surface, c = :blues)
 savefig("Ex 8 - 3d.png")
 
 zy0 = f.(x,0)
+zy1 = f.(x,1)
+zym1 = f.(x,-1)
+zy5 = f.(x,0.5)
+zym5 = f.(x,-1.5)
 p = plot(x = x, y = zy0, Geom.line,
          Guide.title("Y = 0"), theme);
-draw(SVG("Ex8 - NEW - given y0", 30cm, 15cm), p)
-zy1 = f.(x,1)
-plot(x, zy1, size = (1400, 1080));
-savefig("zy1.png")
-zym1 = f.(x,-1)
-plot(x, zym1, size = (1400, 1080));
-savefig("zym1.png")
-zy5 = f.(x,0.5)
-plot(x, zy5, size = (1400, 1080));
-savefig("zy5.png")
-zym5 = f.(x,-1.5)
-plot(x, zym5, size = (1400, 1080));
-savefig("zym5.png")
+draw(SVG("Ex8 - NEW - given y0.svg", 15cm, 15cm), p)
+p = plot(x = x, y = zy1, Geom.line,
+         Guide.title("Y = 1"), theme);
+draw(SVG("Ex8 - NEW - given y1.svg", 15cm, 15cm), p)
+p = plot(x = x, y = zym1, Geom.line,
+         Guide.title("Y = -1"), theme);
+draw(SVG("Ex8 - NEW - given y-1.svg", 15cm, 15cm), p)
+p = plot(x = x, y = zy5, Geom.line,
+         Guide.title("Y = 0.5"), theme);
+draw(SVG("Ex8 - NEW - given y05.svg", 15cm, 15cm), p)
+p = plot(x = x, y = zym5, Geom.line,
+         Guide.title("Y = -0.5"), theme);
+draw(SVG("Ex8 - NEW - given y-05.svg", 15cm, 15cm), p)
