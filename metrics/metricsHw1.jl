@@ -5,8 +5,7 @@ using DataFrames
 using Dates
 using Optim
 using CSV
-using Gadfly
-# , Cairo, Fontconfig
+using Gadfly , Cairo, Fontconfig
 
 theme = Theme(major_label_font_size = 24pt, minor_label_font_size=14pt, line_width = 3px,
               background_color = "white", key_position = :none, panel_stroke = "black")
@@ -360,14 +359,15 @@ draw(SVG("Ex7 - NEW - SMSE.svg", 30cm, 15cm), p)
 φ = x -> pdf(Normal(), x)
 Φ = x -> cdf(Normal(),x)
 f(x, y) = φ(x)*φ(y)*(1 - 0.5*(1 - 2*Φ(x))*(1 - 2*Φ(y)))
-x = -2:0.02:2
-y = -2:0.02:2
+x = -2:0.1:2
+y = -2:0.1:2
 z = f.(x,y)
 
 using Plots
+pyplot()
 Plots.scalefontsizes(2)
-plot3d(x,y,f, st=:surface, c = :blues)
-savefig("Ex 8 - 3d.png")
+plot3d(x,y,f, st=:surface, c = :viridis, camera=[30, 36], linecolor = :black, linewidth = 0.5)
+savefig("Ex 8 - NEW - 3d.png")
 
 zy0 = f.(x,0)
 zy1 = f.(x,1)
