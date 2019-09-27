@@ -5,8 +5,9 @@ using DataFrames
 using Dates
 using Optim
 using CSV
-using Gadfly
+using Gadfly, Cairo, Fontconfig
 
+theme = Theme(line_width = 2pt, minor_label_font_size = 16pt)
 # Exercise 1:
 MSE = function(β, b)
   β_bar = mean(β, dims=1)
@@ -58,9 +59,14 @@ res = load("res.jld", "res")
 end
 
 resStack = stack(res, [:SBias, :SBias2])
-p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
+p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, 
+         Geom.bar(position = :dodge), Guide.title("MSE"),
+         Guide.xlabel(nothing), Guide.ylabel(nothing),
+         Theme(major_label_font_size = 24pt, minor_label_font_size=16pt, background_color = "white",
+              key_position = :none));
+p
 p = plot(resStack[resStack.n .== 1000, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
-draw(PNG("Ex1 - Bias100.png", 30cm, 15cm), p)
+draw(SVG("Ex1 - NEW - Bias100.svg", 30cm, 15cm), p)
 
 resStack = stack(res, [:Var, :Var2])
 p = plot(resStack[resStack.n .== 100, :], x = :dz, y = :value, color = :variable, Geom.bar(position = :dodge), Theme(minor_label_font_size=16pt));
