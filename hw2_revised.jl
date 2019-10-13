@@ -1,6 +1,8 @@
 # If you wish to run, install Gadfly and DataFrames run everything and check
 # the results at the and of file.
 
+% Looks good!
+
 using LinearAlgebra
 using Dates
 # Pkg.add("DataFrames")
