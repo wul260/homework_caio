@@ -19,13 +19,11 @@ function logLik(β, X, y)
     error("X and y must have compatible dimensions")
   end
 
-  logLikvalue = 0
-  for i in 1:size(y)[1]
-    logLikvalue += -exp(X[i, :]' * β) + y[i]*X[i,:]'*β - log(!y[i])
-  end
-  return -logLikvalue
+  return -sum(exp.(X * β) + y.*(X*β) - log.(factorial.(y)))
 end
 
+β = [ 2; 3; 0; 0; 1; 0 ]
+logLik(β, X, y)
 function ∇(β, X, y)
   # Sanity check
   if(size(X)[1] != size(y)[1])
@@ -83,7 +81,8 @@ end
 # adaptation of the "Levenberg-Marquardt" algorithm. A equally named function
 # (in the better documented R) also uses the "Levenberg-Marquardt".
 # This method is translated to julia by the following package/method:
-@. model(x, β) = exp(x[:,1]*β[1] + x[:, 2]*β[2] + x[:, 3]*β[3] + x[:, 4]*β[4] + x[:, 5]*β[5] + x[:, 6]*β[6])
+# @. model(x, β) = exp(x[:,1]*β[1] + x[:, 2]*β[2] + x[:, 3]*β[3] + x[:, 4]*β[4] + x[:, 5]*β[5] + x[:, 6]*β[6])
+@. model(x, β) = exp()
 res_3 = curve_fit(model, X, y, zeros(6))
 coef(res_3)
 
