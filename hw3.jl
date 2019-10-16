@@ -90,3 +90,34 @@ coef(res_3)
 # Question 4
 res_4 = optimize(β -> rss(β, X, y), fill(0.4, 6), NelderMead())
 min_4 = Optim.minimizer(res_4)
+
+# Question 5
+
+init = []
+for i in -1.5:0.2:1.5
+  push!(init, i * min_new)
+end
+
+function parse_results(res, new)
+  ini  = Optim.initial_state(res)[1]/new[1]
+  bool = Optim.converged(res)
+  dist = norm(new - Optim.minimizer(res))
+  return (ini, summary(res), bool, dist)
+end
+
+final_res = DataFrame(init = Float64[], method = String[], converged = Bool[], distance = Float64[])
+for i in init
+  res_1 = optimize(β -> logLik(β, X, y), i, NelderMead())
+  push!(final_res, parse_results(res_1, min_new))
+  res_2 = optimize(β -> logLik(β, X, y), β -> ∇(β, X, y), i, LBFGS(); inplace = false)
+  push!(final_res, parse_results(res_2, min_new))
+  res_3 = curve_fit(model, X, y, i)
+  push!(final_res, (i[1]/min_new[1], "LSQ", true, norm(min_new - coef(res_3))))
+  res_4 = optimize(β -> rss(β, X, y), i, NelderMead())
+  push!(final_res, parse_results(res_4, min_new))
+end
+final_res
+by(final_res, :method, :converged => mean)
+by(final_res, :method, :distance => mean)
+# L-BFGS is more sensible to initial conditions but when it converges it 
+# get closer to the Newton Method answer.
