@@ -1,6 +1,8 @@
 using CSV
 using DataFrames
 using Optim
+using LsqFit
+using LinearAlgebra
 import Base.!
 
 !(x::Int64) = factorial(x)
@@ -9,8 +11,7 @@ X = CSV.read("X.csv", header=false)
 y = CSV.read("y.csv", header=false)
 
 X = convert(Matrix, X)
-y = convert(Matrix, y)
-plot(y = y, x = X[:, 4], Geom.point)
+y = y[:,1]
 
 function logLik(β, X, y)
   # Sanity check
@@ -60,3 +61,32 @@ res_new = optimize(β -> logLik(β, X, y), β -> ∇(β, X, y), β -> h(β, X), 
 min_new = Optim.minimizer(res_new)
 
 #same as BFGS
+
+### RSS
+function rss(β, X, y)
+  # Sanity check
+  if(size(X)[1] != size(y)[1])
+    error("X and y must have compatible dimensions")
+  end
+
+  rss = 0
+  for i in 1:size(y)[1]
+    rss += (y[i] - exp(β'*X[i, :]))^2
+  end
+  return rss
+end
+
+# Question 3
+# This question is MATLAB-dependant seems it use a particular MATLAB function,
+# searching in MATLAB help page I found out that MATLAB claims to use the 
+# "trust-region-reflective", looking further I discover that this is a 
+# adaptation of the "Levenberg-Marquardt" algorithm. A equally named function
+# (in the better documented R) also uses the "Levenberg-Marquardt".
+# This method is translated to julia by the following package/method:
+@. model(x, β) = exp(x[:,1]*β[1] + x[:, 2]*β[2] + x[:, 3]*β[3] + x[:, 4]*β[4] + x[:, 5]*β[5] + x[:, 6]*β[6])
+res_3 = curve_fit(model, X, y, zeros(6))
+coef(res_3)
+
+# Question 4
+res_4 = optimize(β -> rss(β, X, y), fill(0.4, 6), NelderMead())
+min_4 = Optim.minimizer(res_4)
