@@ -3,9 +3,6 @@ using DataFrames
 using Optim
 using LsqFit
 using LinearAlgebra
-import Base.!
-
-!(x::Int64) = factorial(x)
 
 X = CSV.read("X.csv", header=false)
 y = CSV.read("y.csv", header=false)
@@ -19,11 +16,9 @@ function logLik(β, X, y)
     error("X and y must have compatible dimensions")
   end
 
-  return -sum(exp.(X * β) + y.*(X*β) - log.(factorial.(y)))
+  return -sum(-exp.(X * β) + y.*(X*β) - log.(factorial.(y)))
 end
 
-β = [ 2; 3; 0; 0; 1; 0 ]
-logLik(β, X, y)
 function ∇(β, X, y)
   # Sanity check
   if(size(X)[1] != size(y)[1])
@@ -55,7 +50,7 @@ function h(β, X)
   return H
 end
 
-res_new = optimize(β -> logLik(β, X, y), β -> ∇(β, X, y), β -> h(β, X), [1.0;0;0;0;0;0], Newton(), Optim.Options(show_trace = true); inplace = false)
+res_new = optimize(β -> logLik(β, X, y), β -> ∇(β, X, y), β -> h(β, X), min_2, Newton(), Optim.Options(show_trace = true); inplace = false)
 min_new = Optim.minimizer(res_new)
 
 #same as BFGS
@@ -81,8 +76,7 @@ end
 # adaptation of the "Levenberg-Marquardt" algorithm. A equally named function
 # (in the better documented R) also uses the "Levenberg-Marquardt".
 # This method is translated to julia by the following package/method:
-# @. model(x, β) = exp(x[:,1]*β[1] + x[:, 2]*β[2] + x[:, 3]*β[3] + x[:, 4]*β[4] + x[:, 5]*β[5] + x[:, 6]*β[6])
-@. model(x, β) = exp()
+@. model(x, β) = exp(x[:,1]*β[1] + x[:, 2]*β[2] + x[:, 3]*β[3] + x[:, 4]*β[4] + x[:, 5]*β[5] + x[:, 6]*β[6])
 res_3 = curve_fit(model, X, y, zeros(6))
 coef(res_3)
 
@@ -104,7 +98,7 @@ function parse_results(res, new)
   return (ini, summary(res), bool, dist)
 end
 
-final_res = DataFrame(init = Float64[], method = String[], converged = Bool[], distance = Float64[])
+final_res = DataFrame(init = Float64[], alg = String[], converged = Bool[], distance = Float64[])
 for i in init
   res_1 = optimize(β -> logLik(β, X, y), i, NelderMead())
   push!(final_res, parse_results(res_1, min_new))
@@ -116,7 +110,8 @@ for i in init
   push!(final_res, parse_results(res_4, min_new))
 end
 final_res
-by(final_res, :method, :converged => mean)
-by(final_res, :method, :distance => mean)
+by(final_res, :alg, :converged => mean)
+by(final_res, :alg, :distance => mean)
 # L-BFGS is more sensible to initial conditions but when it converges it 
 # get closer to the Newton Method answer.
+final_res[final_res.alg .== "LSQ",:]
