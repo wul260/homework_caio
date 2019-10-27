@@ -16,8 +16,7 @@
 
 \maketitle % Print the title
 
-%----------------------------------------------------------------------------------------
-%	PROBLEM 1
+%	PROBLEM 1 {{{
 %----------------------------------------------------------------------------------------
 
 \section{Question 1}
@@ -36,8 +35,9 @@ low values of $h$, but as $h \rightarrow 0$ the estimator goes awry, as
 $h \rightarrow \infty$ the error increases smoothly. The same seems to
 apply for the regression estimator but we can observe a second valley near $1$.
 
-%{{{-------------------------------------------------------------------------------------
-%	PROBLEM 2 
+% }}}
+
+%	PROBLEM 2  {{{
 %----------------------------------------------------------------------------------------
 
 \section{Question 2}
@@ -73,8 +73,58 @@ This graph also have an additional line (\#5) which reference the local linear e
 the $MSE$ of this line does not really compare to the other lines since we are estimating
 different objects but the behavior along $h$ seems to be the same.
 
-\section{3}
+% }}}
 
+%	PROBLEM 3  {{{
+%----------------------------------------------------------------------------------------
 
+\section{Question 3}
+
+\subsection{a}
+\begin{center}
+\includegraphics[width=16cm, height=8cm]{Q3-a.png}
+\end{center}
+
+For both the high and the low bandwidth we see that the kernel collapse to zero,
+this probably happens because $10^{-6}$ is so low that most intervals have zero
+measure, and for the $10^6$ the bandwidth covers all observations and it is 
+therefore impossible to distinguish between them.
+
+\subsection{b}
+\begin{center}
+\includegraphics[width=16cm, height=8cm]{Q3-b.png}
+\end{center}
+
+For the regression estimator things don't get much better the very low bandwith
+causes most estimators to be $NaN$ and therefore the plot is empty, for the very
+high bandwidth we estimation is no better than a simple average
+
+\begin{center}
+\includegraphics[width=8cm, height=8cm]{Q3-c.png}
+\end{center}
+
+We can observe that the we have a hard time fitting the curvy behavior of
+the normal kernel to the flat line that is the uniform. This is not however a 
+bandwidth problem, testing with higher are lower bandwidths showed similar results.
+Moreover we can observe that the problem get worse at the boundaries.
+% }}}
+%	PROBLEM 4  {{{
+%----------------------------------------------------------------------------------------
+
+\section{Question 4}
+
+\begin{center}
+\includegraphics[width=16cm, height=8cm]{Q4-ab.png}
+\end{center}
+
+Visual inspection:
+
+\begin{center}
+\includegraphics[width=16cm, height=16cm]{Q4-c.png}
+\end{center}
+
+Silverman Rule of thumb suggested a bandwidth around $13,000$, Cross Validation one
+around $9,000$, visualy both results seem appealing.
+%}}}
 
 \end{document}

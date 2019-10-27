@@ -21,7 +21,7 @@ k3(x) = 2*φ(x) - φ(x/sqrt(2))/sqrt(2)
 k4(x) = sin(π*x)/π*x
 k = Dict(:1 => k1, :2 => k2, :3 => k3, :4 => k4)
 # }}}
-## Cross validation {{{2
+## Cross validation [long estimation] {{{2
 if isfile("Q2-cvs.jld")
   cv_value = load("Q2-cvs.jld")["cv_value"]
 else
@@ -90,23 +90,75 @@ draw(PNG("Q2-b.png", 16cm, 16cm), q2_plot(q2b, cv_value))
 ### Q3 {{{
 ## Q3 - a {{{2
 x = rand(Γ, 1000)
-p1 = plot(z -> kernel(z, x, 1e-6, φ), -5, 20)
-p2 = plot(z -> kernel(z, x, 1e+6, φ), -5, 20)
+p1 = plot(z -> kernel(z, x, 1e-6, φ), -5, 20,
+          Guide.ylabel("density"), Guide.yticks(ticks=[-0.0001 0 0.0001]))
+p2 = plot(z -> kernel(z, x, 1e+6, φ), -5, 20,
+          Guide.ylabel("density"), Guide.yticks(ticks=[-0.0001 0 0.0001]))
 draw(PNG("Q3-a.png", 16cm, 8cm), hstack(p1, p2))
 ### 2}}}
 ## Q3 - b {{{2
 y = log.(x.^2 .+ 1)
-p2 = plot(layer(z -> kreg(z, x, y, 1e-4, φ), -5, 20),
-          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")))
+p1 = plot(layer(z -> kreg(z, x, y, 1e-6, φ), -5, 20),
+          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")),
+          Guide.ylabel("f(x)"), Guide.xlabel("x"),  Guide.yticks(ticks=-1:6))
 p2 = plot(layer(z -> kreg(z, x, y, 1e+6, φ), -5, 20),
-          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")))
+          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")),
+          Guide.ylabel("f(x)"), Guide.xlabel("x"),  Guide.yticks(ticks=-1:6))
 draw(PNG("Q3-b.png", 16cm, 8cm), hstack(p1, p2))
 ### 2}}}
 ## Q3 - c {{{2
-x = randn(1000)
-σ = var(x)
-p1 = plot(z -> kernel(z, x, σ*1000^(-1/5), φ), -4, 4)
-
+x = rand(1000)
+σ = sqrt(var(x))
+p1 = plot(z -> kernel(z, x, σ*1000^(-1/5), φ), 0, 1, Guide.ylabel("density"))
+draw(PNG("Q3-c.png", 8cm, 8cm), p1)
 ## 2}}}
+### }}}
+
+### Q4 {{{
+data = CSV.read("psam_h08.csv")
+inc  = data.HINCP[.!ismissing.(data.HINCP)]
+
+function plot_kernel(h, p = true)
+  x    = 1000:1000:500000
+  
+  density = []
+  for xi in x
+    push!(density, kernel(xi, inc, h, φ))
+  end
+
+  if p
+    return plot(x = x, y = density, Geom.line, 
+                Guide.ylabel("density"), Guide.xlabel("Household income"))
+  else
+    return plot(x = x, y = density, Geom.line,
+                Guide.ylabel(""), Guide.xlabel(""),
+                Guide.title(string("h = ", h)),
+                Guide.yticks(label = false), Guide.xticks(label = false),
+                Theme(plot_padding = [1mm], background_color = "white"))
+  end
+end
+
+## Q4 - a {{{2
+h  = sqrt(var(inc))*length(inc)^(-1/5)
+pa = plot_kernel(h)
+push!(pa, Guide.title(string("h = ", h)))
+## 2}}}
+## Q4 - b {{{2
+# h    = cv(inc, φ, 0, 20000)
+h  = 9918.5355
+pb = plot_kernel(h)
+push!(pb, Guide.title(string("h = ", h)))
+draw(PNG("Q4-ab.png", 16cm, 8cm), hstack(pa, pb))
+## 2}}}
+## Q4 - c {{{2
+plots = Array{Plot}(undef, 0)
+for h in 1000:3000:25000
+  push!(plots, plot_kernel(h, false))
+end
+plots = reshape(plots, 3, 3)
+p = gridstack(plots)
+draw(PNG("Q4-c.png", 24cm, 24cm), p)
+## 2}}}
+
 
 ### }}}

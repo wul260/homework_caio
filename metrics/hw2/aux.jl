@@ -1,13 +1,18 @@
+### packages {{{
 using Distributions
 using DataFrames
 using Optim
 using JLD
+using CSV
+### }}}
 
+### Variables {{{
 Γ = Gumbel()
 φ(x) = pdf.(Normal(), x)
 theme = Theme(background_color = "white");
+### }}}
 
-
+### General utility function {{{
 MSE = function(β, b::Float64)
   β = convert(Array{Float64}, β) 
   β_bar = mean(β)
@@ -18,7 +23,9 @@ MSE = function(β, b::Float64)
   return (bias = β_bias, var = β_var, mse = β_mse)
 end
 
-# Defining Plot
+###}}}
+
+### Q2 Plot function {{{
 function q2_plot(data, cv_value)
   p = []
   for n in [10 100 1000]
@@ -37,6 +44,7 @@ function q2_plot(data, cv_value)
   end
   return vstack(hstack(p[1], p[2]), p[3])
 end
+### }}}
 
 ### Kernel Estimators {{{
 function kernel(x, X, h, k)
@@ -62,18 +70,43 @@ function loclin(x, X, Y, h, k)
   return (res[1], res[2])
 end
 ###}}}
-### Calculating CVs [long estimation]
+
+### Calculating CVs {{{
 function cv_step(x, k, h)
+  println(h)
   n = length(x)
   val = 0
   for i in 1:n
     y = x[1:end .!= i]
-    val += log(max(0, 1/(h*(n - 1))*sum(k.((y .- x[i])./h))))
+    val += log(max(0, 1/(h[1]*(n - 1))*sum(k.((y .- x[i])./h[1]))))
   end
   return val
 end
+-
+# infruitforeus attempt to speed cv calculation {{{3
+function dcv(x, h)
+  n = length(x)
+  α = 1/(h[1]*(n-1))
+  β = 0
+  γ = 0
+  for i in 1:n
+    y = x[1:end .!= i]
+    β += sum(φ.((y .- x[i])./h[1]))
+    γ += sum(dφ.((y .- x[i])./h[1]) .* (y .- x[i]))
+  end
 
-function cv(x, k)
-  res = optimize(h -> -cv_step(x, k, h), 0, 2)
+  1/(h[1]^2*α*β) * (β/(n-1) + α*γ)
+end
+function dφ(x)
+  -x/sqrt(2*π) * exp(-x^2/2)
+end
+function dφ2(x)
+  (-1 + x^2)/sqrt(2*π) * exp(-x^2/2)
+end
+#3}}}
+
+function cv(x, k, lower, upper)
+  res = optimize(h -> -cv_step(x, k, h), lower, upper)
   return Optim.minimizer(res)
 end
+### }}}
