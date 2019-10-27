@@ -5,6 +5,9 @@ using JLD
 
 include("aux.jl")
 
+<<<<<<< HEAD
+### Q2
+=======
 ### Q1 {{{
 
 x = rand(Γ, 1000)
@@ -99,7 +102,11 @@ else
   q2b    = vcat(r_mse, ll_mse)
   save("Q2-b.jld", "q2b", res4_2b)
 end
+<<<<<<< HEAD
+draw(PNG("Q2-b.png", 1200px, 600px), q2_plot(q2b, cv_value))
+=======
 draw(PNG("Q2-b.png", 16cm, 16cm), q2_plot(q2b, cv_value))
 
 ### }}}
 ### }}}
+>>>>>>> a0ae797ea4cbd551f053aeb74037ba190480873a
