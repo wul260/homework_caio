@@ -1,0 +1,19 @@
+---
+title : Problem Set 2
+author : Caio Figueiredo
+---
+
+```julia; echo = false
+using Gadfly
+```
+
+## Q1 - 
+
+## Q2 - a
+
+Observe MSE on the following graph:
+
+
+```julia;
+plot(y = rand(100))
+```
