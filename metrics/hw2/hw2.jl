@@ -1,8 +1,3 @@
-using Distributions
-using DataFrames
-using Optim
-using JLD
-
 include("aux.jl")
 
 ### Q1 {{{
@@ -90,4 +85,28 @@ end
 draw(PNG("Q2-b.png", 16cm, 16cm), q2_plot(q2b, cv_value))
 
 ### }}}
+### }}}
+
+### Q3 {{{
+## Q3 - a {{{2
+x = rand(Γ, 1000)
+p1 = plot(z -> kernel(z, x, 1e-6, φ), -5, 20)
+p2 = plot(z -> kernel(z, x, 1e+6, φ), -5, 20)
+draw(PNG("Q3-a.png", 16cm, 8cm), hstack(p1, p2))
+### 2}}}
+## Q3 - b {{{2
+y = log.(x.^2 .+ 1)
+p2 = plot(layer(z -> kreg(z, x, y, 1e-4, φ), -5, 20),
+          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")))
+p2 = plot(layer(z -> kreg(z, x, y, 1e+6, φ), -5, 20),
+          layer(z -> log(z^2 + 1), -5 , 20, Theme(default_color="red")))
+draw(PNG("Q3-b.png", 16cm, 8cm), hstack(p1, p2))
+### 2}}}
+## Q3 - c {{{2
+x = randn(1000)
+σ = var(x)
+p1 = plot(z -> kernel(z, x, σ*1000^(-1/5), φ), -4, 4)
+
+## 2}}}
+
 ### }}}

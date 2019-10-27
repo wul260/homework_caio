@@ -1,3 +1,8 @@
+using Distributions
+using DataFrames
+using Optim
+using JLD
+
 Γ = Gumbel()
 φ(x) = pdf.(Normal(), x)
 theme = Theme(background_color = "white");
@@ -33,7 +38,7 @@ function q2_plot(data, cv_value)
   return vstack(hstack(p[1], p[2]), p[3])
 end
 
-# Kernel Estimators
+### Kernel Estimators {{{
 function kernel(x, X, h, k)
   n = length(X)
   1/(n*h) * sum(k.((X .- x) ./ h))
@@ -56,6 +61,7 @@ function loclin(x, X, Y, h, k)
   res = Optim.minimizer(res)
   return (res[1], res[2])
 end
+###}}}
 ### Calculating CVs [long estimation]
 function cv_step(x, k, h)
   n = length(x)
