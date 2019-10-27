@@ -1,0 +1,60 @@
+\documentclass{article}
+\usepackage{graphicx}
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Econometrics: Homework} % Title of the assignment
+
+\author{Caio Figueiredo} % Author name and email address
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+%----------------------------------------------------------------------------------------
+%	PROBLEM 1
+%----------------------------------------------------------------------------------------
+
+\section{Question 2}
+
+\subsection{a}
+
+In the following graphs the kernel number 4 will be ignore, since it's MSE 
+is much worse than the others that it undermines readability.
+
+\begin{center}
+\includegraphics[width=16cm, height=16cm]{Q2-a.png}
+\end{center}
+
+The points 1,2 and 3 are the suggested value for the bandwidth using the cross
+validation method for kernel number 1, 2 and 3 respectively. The method does not
+match the value of $h$ that minimizes the $MSE$ but overall behave really well and stays
+in a decently close neighborhood of that point.
+
+\subsection{b}
+
+\begin{center}
+\includegraphics[width=16cm, height=16cm]{Q2-b.png}
+\end{center}
+
+Here we have a different story, ignoring the case for $n = 10$ where the our estimator
+does not behave really well the $MSE$ seems to be a increasing function of the bandwidth,
+that is the lower the $MSE$ the better, which is not at all that intuitive.
+
+Of course because of this the values suggested by the cross validation method does not
+work well if the regression estimator.
+
+This graph also have an additional line (\#5) which reference the local linear estimator,
+the $MSE$ of this line does not really compare to the other lines since we are estimating
+different objects but the behavior along $h$ seems to be the same.
+
+\section{3}
+
+
+
+\end{document}
