@@ -7,12 +7,14 @@ include("aux.jl")
 
 ### Q1 {{{
 
-x = rand(Γ, 1000)
+x = rand(Γ, 100000)
 y = exp.(x)
-p = plot(h -> (kernel(1, x, h, φ) - pdf(Γ, 1))^2, 0.1, 1)
-p = plot(h -> (kreg(1, x, y, h, φ) - exp(1))^2, 0.1, 1)
->>>>>>> a0ae797ea4cbd551f053aeb74037ba190480873a
-
+p1 = plot(h -> (kernel(1, x, h, φ) - pdf(Γ, 1))^2, 0.001, 1,
+          Guide.xlabel("h"), Guide.ylabel("Square Difference"), Guide.title("Kernel"))
+p2 = plot(h -> (kreg(1, x, y, h, φ) - exp(1))^2, 0.001, 1,
+          Guide.xlabel("h"), Guide.ylabel("Square Difference"), Guide.title("Regression"))
+p = hstack(p1, p2)
+draw(PNG("Q1.png",16cm, 8cm), p)
 
 ### }}}
 
@@ -23,12 +25,8 @@ k2(x) = φ(x)*(3 - x^2)/2
 k3(x) = 2*φ(x) - φ(x/sqrt(2))/sqrt(2)
 k4(x) = sin(π*x)/π*x
 k = Dict(:1 => k1, :2 => k2, :3 => k3, :4 => k4)
-<<<<<<< HEAD
-
-=======
 # }}}
 ## Cross validation {{{2
->>>>>>> a0ae797ea4cbd551f053aeb74037ba190480873a
 if isfile("Q2-cvs.jld")
   cv_value = load("Q2-cvs.jld")["cv_value"]
 else
@@ -43,15 +41,9 @@ else
   end
   save("Q2-cvs.jld", "cv_value", cv_value)
 end
-
-<<<<<<< HEAD
-## Q2 - a Bootstrap Simulation and Estimation
-k_est= DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], est = Float64[])
-=======
 ## 2}}}}
 ## Q2 - a {{{2
-res = DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], est = Float64[])
->>>>>>> a0ae797ea4cbd551f053aeb74037ba190480873a
+k_est = DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], est = Float64[])
 for n in [10 100 1000], i in 1:1000 
   x = rand(Γ, n)
   for j in 1:4, h in 0.1:0.05:1.5
@@ -61,11 +53,7 @@ end
 
 k_mse = by(k_est, [:n, :h, :method], :est => β -> MSE(β, pdf(Γ, 1)))
 
-<<<<<<< HEAD
-draw(PNG("Q2-a.png", 1200px, 600px), q2_plot(k_mse, cv_value))
-=======
-draw(PNG("Q2-a.png", 16cm, 16cm), q2_plot(res2, cv_value))
->>>>>>> a0ae797ea4cbd551f053aeb74037ba190480873a
+draw(PNG("Q2-a.png", 16cm, 16cm), q2_plot(k_mse, cv_value))
 
 # 2}}}
 ## Q2 - b {{{2
@@ -94,10 +82,10 @@ else
     end
   end
 
-  ll_mse = by(ll_est, [:n, :h], :loclin_1 => β -> MSE(β, 1.0))
+  ll_mse  = by(ll_est, [:n, :h], :loclin_1 => β -> MSE(β, 1.0))
   ll_mse.method = 5
-  q2b    = vcat(r_mse, ll_mse)
-  save("Q2-b.jld", "q2b", res4_2b)
+  q2b_mse = vcat(r_mse, ll_mse)
+  save("Q2-b.jld", "q2b_mse", q2b_mse)
 end
 draw(PNG("Q2-b.png", 16cm, 16cm), q2_plot(q2b, cv_value))
 
