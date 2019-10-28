@@ -27,7 +27,8 @@ MSE = function(β, b::Float64)
 end
 ###}}}
 
-### Q2 Plot function {{{
+### Plot functions {{{
+## Q2 Plot {{{2
 function q2_plot(data, cv_value)
   p = []
   for n in [10 100 1000]
@@ -46,6 +47,28 @@ function q2_plot(data, cv_value)
   end
   return vstack(hstack(p[1], p[2]), p[3])
 end
+## 2}}}
+## Q4 Plot {{{
+function plot_kernel(h, p = true)
+  x    = 1000:1000:500000
+  
+  density = []
+  for xi in x
+    push!(density, kernel(xi, inc, h, φ))
+  end
+
+  if p
+    return plot(x = x, y = density, Geom.line, 
+                Guide.ylabel("density"), Guide.xlabel("Household income"))
+  else
+    return plot(x = x, y = density, Geom.line,
+                Guide.ylabel(""), Guide.xlabel(""),
+                Guide.title(string("h = ", h)),
+                Guide.yticks(label = false), Guide.xticks(label = false),
+                Theme(plot_padding = [1mm], background_color = "white"))
+  end
+end
+## }}}
 ### }}}
 
 ### Kernel Estimators {{{
