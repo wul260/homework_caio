@@ -8,11 +8,14 @@ using CSV
 
 ### Variables {{{
 Γ = Gumbel()
-φ(x) = pdf.(Normal(), x)
 theme = Theme(background_color = "white");
 ### }}}
 
 ### General utility function {{{
+φ(x)  = pdf(Normal(), x)
+Φ(x)  = cdf(Normal(), x)
+dφ(x) = -x/sqrt(2*π) * exp(-x^2/2)
+
 MSE = function(β, b::Float64)
   β = convert(Array{Float64}, β) 
   β_bar = mean(β)
@@ -22,7 +25,6 @@ MSE = function(β, b::Float64)
 
   return (bias = β_bias, var = β_var, mse = β_mse)
 end
-
 ###}}}
 
 ### Q2 Plot function {{{
@@ -62,6 +64,18 @@ function kreg(x, X, Y, h, k)
   a(x, X, Y, h, k)/kernel(x, X, h, k)
 end
 
+function aderivative(X, Y, h)
+  n = size(X)[1]
+  d = size(X)[2]
+  val = zeros(d)
+  for i in 1:n
+    for j in 1:n
+      val += dφ.((X[i,:] - X[j,:]) ./ h).*Y[i]
+    end
+  end
+  return -2/(n^2*h^d).*val
+end
+
 function loclin(x, X, Y, h, k)
   step(γ) = sum((Y .- γ[1] - γ[2].*(X .- x)).^2 .* k.((X .- x)./h))
 
@@ -77,8 +91,14 @@ function cv_step(x, k, h)
   n = length(x)
   val = 0
   for i in 1:n
-    y = x[1:end .!= i]
-    val += log(max(0, 1/(h[1]*(n - 1))*sum(k.((y .- x[i])./h[1]))))
+     y = x[1:end .!= i]
+     z = 1/(h[1]*(n - 1))*sum(k.((y .- x[i])./h[1]))
+    if z > 0
+      val += log(z)
+    else
+      val = -Inf
+      break
+    end
   end
   return val
 end
@@ -96,9 +116,6 @@ function dcv(x, h)
   end
 
   1/(h[1]^2*α*β) * (β/(n-1) + α*γ)
-end
-function dφ(x)
-  -x/sqrt(2*π) * exp(-x^2/2)
 end
 function dφ2(x)
   (-1 + x^2)/sqrt(2*π) * exp(-x^2/2)

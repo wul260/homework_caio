@@ -141,13 +141,13 @@ end
 ## Q4 - a {{{2
 h  = sqrt(var(inc))*length(inc)^(-1/5)
 pa = plot_kernel(h)
-push!(pa, Guide.title(string("h = ", h)))
+push!(pa, Guide.title("Silverman"))
 ## 2}}}
 ## Q4 - b {{{2
 # h    = cv(inc, φ, 0, 20000)
 h  = 9918.5355
 pb = plot_kernel(h)
-push!(pb, Guide.title(string("h = ", h)))
+push!(pb, Guide.title("Cross Validation"))
 draw(PNG("Q4-ab.png", 16cm, 8cm), hstack(pa, pb))
 ## 2}}}
 ## Q4 - c {{{2
@@ -162,3 +162,29 @@ draw(PNG("Q4-c.png", 24cm, 24cm), p)
 
 
 ### }}}
+
+### Q6 {{{
+## Simulation {{{2
+σ = 1.0*convert(Matrix, Diagonal(5:5:25))
+X = rand(MvNormal(σ), 1000)
+β = [1; 2; 1; 2; 1] ./ [5; 10; 15; 20; 25]
+f = X'*β + randn(1000)
+Y = f .> 0.4
+## }}}
+## Probit {{{2
+probit(β) = -sum(Y.*log.(Φ.(X'*β)) + (1 .- Y).*log.((1 .- Φ.(X'*β))))
+probit_res = optimize(probit, zeros(5))
+probit_est = Optim.minimizer(probit_res)
+## }}}
+## 
+
+## Average Derivative {{{2
+h = var(X, dims = 2) .* 1000^(-1/5)
+aderivative(X', Y, h)
+## }}}
+
+##  {{{2
+
+## 2}}}
+
+### }}} 
