@@ -31,8 +31,8 @@ end
 function q2_plot(data, cv_value)
   p = []
   for n in [10 100 1000]
-    x    = filter(r -> r.n == n && r.method != Symbol(4), data)
-    cv   = cv_value[n][1:3]
+    x    = filter(r -> r.n == n, data)
+    cv   = cv_value[n][1:4]
     xmin =  minimum(x.mse)
     if(n != 1000)
       theme = Theme(background_color = "white", key_position=:none)

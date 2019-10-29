@@ -18,7 +18,7 @@ draw(PNG("Q1.png",16cm, 8cm), p)
 k1(x) = φ(x)
 k2(x) = φ(x)*(3 - x^2)/2
 k3(x) = 2*φ(x) - φ(x/sqrt(2))/sqrt(2)
-k4(x) = sin(π*x)/π*x
+k4(x) = sin(π*x)/(π*x)
 k = Dict(:1 => k1, :2 => k2, :3 => k3, :4 => k4)
 # }}}
 ## Cross validation [long estimation] {{{2
@@ -41,14 +41,17 @@ end
 k_est = DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], est = Float64[])
 for n in [10 100 1000], i in 1:1000 
   x = rand(Γ, n)
-  for j in 1:4, h in 0.1:0.05:1.5
+  for j in 1:4, h in 0.1:0.1:2
     push!(k_est, (n, i, h, Symbol(j), kernel(1, x, h, k[j])))
   end
 end
 
 k_mse = by(k_est, [:n, :h, :method], :est => β -> MSE(β, pdf(Γ, 1)))
+cv_value
 
-draw(PNG("Q2-a.png", 16cm, 16cm), q2_plot(k_mse, cv_value))
+draw(PNG("Q2-a.png", 16cm, 16cm), 
+     q2_plot(k_mse, cv_value)
+    )
 
 # 2}}}
 ## Q2 - b {{{2
@@ -59,7 +62,7 @@ else
   for n in [10 100 1000], i in 1:1000 
     x = rand(Γ, n)
     y = log.(x.^2 .+ 1)
-    for j in 1:4, h in 0.1:0.05:1.5
+    for j in 1:4, h in 0.1:0.1:2
       push!(r_est, (n, i, h, Symbol(j), kreg(1, x, y, h, k[j])))
     end
   end
@@ -70,7 +73,7 @@ else
   for n in [10 100 1000], i in 1:200
     x = rand(Γ, n)
     y = log.(x.^2 .+ 1)
-    for h in 0.1:0.05:1.5
+    for h in 0.1:0.05:2
       row =  (n, i, h)
       row = tuple(row..., loclin(1, x, y, h, k[1])...)
       push!(ll_est, row)
@@ -79,7 +82,7 @@ else
 
   ll_mse  = by(ll_est, [:n, :h], :loclin_1 => β -> MSE(β, 1.0))
   ll_mse.method = 5
-  q2b_mse = vcat(r_mse, ll_mse)
+  q2b = vcat(r_mse, ll_mse)
   save("Q2-b.jld", "q2b_mse", q2b_mse)
 end
 draw(PNG("Q2-b.png", 16cm, 16cm), q2_plot(q2b, cv_value))
@@ -116,6 +119,7 @@ draw(PNG("Q3-c.png", 8cm, 8cm), p1)
 
 ### Q4 {{{
 data = CSV.read("psam_h08.csv")
+data = CSV.read("/home/caio/share/kansas_hincp.csv")
 inc  = data.HINCP[.!ismissing.(data.HINCP)]
 
 function plot_kernel(h, p = true)
