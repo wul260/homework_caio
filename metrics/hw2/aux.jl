@@ -39,9 +39,9 @@ function q2_plot(data, cv_value)
     else
       theme = Theme(background_color = "white")
     end
-    p1 = plot(x, x=:h, y=:mse, color=:method, group=:n, Geom.line, theme,
+    p1 = plot(x, x=:h, y=:mse, color=:method, Geom.line, theme,
               Guide.title(string("n = ", n)),
-              Guide.annotation(compose(context(), text(cv, fill(xmin, 3), ["1"; "2"; "3"]))))
+              Guide.annotation(compose(context(), text(cv, fill(xmin, 4), ["1"; "2"; "3"; "4"]))))
     push!(p, p1)
   end
   return vstack(hstack(p[1], p[2]), p[3])
@@ -87,7 +87,6 @@ end
 
 ### Calculating CVs {{{
 function cv_step(x, k, h)
-  println(h)
   n = length(x)
   val = 0
   for i in 1:n
@@ -122,8 +121,9 @@ function dφ2(x)
 end
 #3}}}
 
-function cv(x, k, lower, upper)
+function cv(x, k, lower = 0, upper = 2)
   res = optimize(h -> -cv_step(x, k, h), lower, upper)
   return Optim.minimizer(res)
+k4(x) = sin(π*x)/π*x
 end
 ### }}}
