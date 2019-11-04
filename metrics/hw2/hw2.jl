@@ -120,26 +120,6 @@ data = CSV.read("psam_h08.csv")
 data = CSV.read("/home/caio/share/kansas_hincp.csv")
 inc  = data.HINCP[.!ismissing.(data.HINCP)]
 
-function plot_kernel(h, p = true)
-  x    = 1000:1000:500000
-  
-  density = []
-  for xi in x
-    push!(density, kernel(xi, inc, h, φ))
-  end
-
-  if p
-    return plot(x = x, y = density, Geom.line, 
-                Guide.ylabel("density"), Guide.xlabel("Household income"))
-  else
-    return plot(x = x, y = density, Geom.line,
-                Guide.ylabel(""), Guide.xlabel(""),
-                Guide.title(string("h = ", h)),
-                Guide.yticks(label = false), Guide.xticks(label = false),
-                Theme(plot_padding = [1mm], background_color = "white"))
-  end
-end
-
 ## Q4 - a {{{2
 h  = sqrt(var(inc))*length(inc)^(-1/5)
 pa = plot_kernel(h)

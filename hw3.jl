@@ -4,6 +4,10 @@ using Optim
 using LsqFit
 using LinearAlgebra
 
+
+# interesting conclusions at the end. everything looks good overall (check a comment below). yoy get a check plus!
+
+
 X = CSV.read("X.csv", header=false)
 y = CSV.read("y.csv", header=false)
 
@@ -16,7 +20,7 @@ function logLik(β, X, y)
     error("X and y must have compatible dimensions")
   end
 
-  return -sum(-exp.(X * β) + y.*(X*β) - log.(factorial.(y)))
+  return -sum(-exp.(X * β) + y.*(X*β) - log.(factorial.(y))) # you should probably drop the factorial term
 end
 
 function ∇(β, X, y)
