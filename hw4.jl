@@ -1,8 +1,14 @@
 using DataFrames
+using Sobol
 
 # Q1
-function calculate_π(n)
+function calculate_π(n::Int64)
   p = [rand(n) rand(n)]
+  calculate_π(p)
+end
+
+function calculate_π(p)
+  n = size(p)[1]
   count = 0 
   for i in 1:n
     if p[i,1]^2 + p[i,2]^2 <= 1
@@ -13,7 +19,13 @@ function calculate_π(n)
   return 4*count/n
 end
 
-calculate_π(10000)
+# Pseudo Random
+calculate_π(n)
+
+# Equidistributed Numbers
+s = SobolSeq(2)
+p = hcat([next!(s) for _ in 1:10000]...)'
+calculate_π(p)
 
 # Q2
 function integrate(f, a, b, N::Int64)
@@ -66,13 +78,24 @@ MSE = function(β, b)
   return hcat(β_bias, β_var, β_mse)
 end
 
-res = DataFrame(n = Int64[], MSE = Float64[], NCerror = Float64[])
+res = DataFrame(n = Int64[], pMC_MSE = Float64[], qMC_error = Float64[],
+                NC_error = Float64[])
 
 for n in [100 1000 10000]
-  β = [calculate_π(n) for i in 1:200]
-  x = MSE(β, π)
-  e = (π - 4*integrate(circle, 0, 1, n))^2
+  β  = [calculate_π(n) for i in 1:200]
+  x  = MSE(β, π)
 
-  push!(res, (n, x[3], e))
+  s  = SobolSeq(2)
+  p  = hcat([next!(s) for _ in 1:n]...)'
+  β2 = calculate_π(p)
+  e1 = (β2 - π)^2
+
+  e2 = (π - 4*integrate(circle, 0, 1, n))^2
+
+  push!(res, (n, x[3], e1, e2))
 end
 res
+
+# NC seem to have the lowest error of them all
+# not truly random number is better than random
+# numbers
