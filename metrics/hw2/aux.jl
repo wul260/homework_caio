@@ -41,6 +41,7 @@ function q2_plot(data, cv_value)
     end
     p1 = plot(x, x=:h, y=:mse, color=:method, Geom.line, theme,
               Guide.title(string("n = ", n)),
+              Coord.cartesian(ymax=0.06),
               Guide.annotation(compose(context(), text(cv, fill(xmin, 4), ["1"; "2"; "3"; "4"]))))
     push!(p, p1)
   end
