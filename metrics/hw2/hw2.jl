@@ -37,7 +37,7 @@ end
 ## 2}}}}
 ## Q2 - a {{{2
 k_est = DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], est = Float64[])
-for n in [10 100 1000], i in 1:1000 
+for n in [10 100 1000], i in 1:1000
   x = rand(Γ, n)
   for j in 1:4, h in 0.1:0.1:2
     push!(k_est, (n, i, h, Symbol(j), kernel(1, x, h, k[j])))
@@ -47,7 +47,7 @@ end
 k_mse = by(k_est, [:n, :h, :method], :est => β -> MSE(β, pdf(Γ, 1)))
 cv_value
 
-draw(PNG("Q2-a.png", 16cm, 16cm), 
+draw(PNG("Q2-a.png", 16cm, 16cm),
      q2_plot(k_mse, cv_value)
     )
 
@@ -57,7 +57,7 @@ if isfile("Q2-b.jld")
   q2b = load("Q2-b.jld")["q2b"]
 else
   r_est = DataFrame(n = Int16[], i = Int16[], h = Float64[], method=Symbol[], kest = Float64[])
-  for n in [10 100 1000], i in 1:1000 
+  for n in [10 100 1000], i in 1:1000
     x = rand(Γ, n)
     y = log.(x.^2 .+ 1) + randn(n)./4
     for j in 1:4, h in 0.01:0.1:2.01
@@ -83,11 +83,13 @@ else
   q2b = vcat(r_mse, ll_mse)
   save("Q2-b.jld", "q2b", q2b)
 end
-draw(PNG("Q2-b.png", 16cm, 16cm), 
+draw(PNG("Q2-b.png", 16cm, 16cm),
      q2_plot(q2b, cv_value)
     )
 
 ### }}}
+### }}}
+
 ### Q3 {{{
 ## Q3 - a {{{2
 x = rand(Γ, 1000)
@@ -150,24 +152,58 @@ draw(PNG("Q4-c.png", 24cm, 24cm), p)
 σ = 1.0*convert(Matrix, Diagonal(5:5:25))
 X = rand(MvNormal(σ), 1000)
 β = [1; 2; 1; 2; 1] ./ [5; 10; 15; 20; 25]
-ε = randn(1000)
-ε = ε .* (X'*ones(5)).^2 ./ 50
-f = X'*β + randn(1000)
+ε = randn(1000)/2
+# ε = ε .* (X'*ones(5)).^2 ./ 50
+f = X'*β + ε
+var(f)
 Y = f .> 0.4
 ## }}}
 ## Probit {{{2
-probit(β) = -sum(Y.*log.(Φ.(X'*β)) + (1 .- Y).*log.((1 .- Φ.(X'*β))))
+probit(β) = -sum(Y.*log.(Φ.(X'*β)) + (1 .- Y).*log.(1 .- Φ.(X'*β)))
 probit_res = optimize(probit, zeros(5))
 probit_est = Optim.minimizer(probit_res)
 ## }}}
-## 
+##
 ## Average Derivative {{{2
 h = var(X, dims = 2) .* 1000^(-1/5)
 aderivative(X', Y, h)
 ## }}}
 
-##  {{{2
+## Klein and Spady  {{{2
+## Best h, don't run it
+# m(z) = optimize(α -> KaS(α.*β, Y, X, z, φ4), 0.5, 1.5)
+# m2(z) = sum((Optim.minimizer(m(z)).*β - β).^2)
+# res = Optim.minimizer(optimize(m2, 0.1, 2))
+h_caio = 0.7221
+
+kas_est_epan = optimize(β -> KaS(β, Y, X, h_caio, Epan4), probit_est)
+kas_est = optimize(β -> KaS(β, Y, X, h_caio, φ4), probit_est,
+                   Optim.Options(show_trace = true))
+Optim.minimizer(res)
+Optim.minimizer(kas_est)
 
 ## 2}}}
 
-### }}} 
+### }}}
+
+### Q10 {{{
+
+β_mean = []
+β_mle  = []
+for i in 1:1000
+  println(i)
+  data = rand(Normal(3, 1), 10)
+  push!(data, rand(Normal(2,1), 1)[1])
+  mean(data)
+  push!(β_mean, mean(data))
+  φ(data, θ) = pdf(Normal(θ, 1), data)
+
+  data = 2.499999999
+  mle(θ) = sum(log.(φ.(data, θ)))
+  v= mle.(1:10)
+  x = findfirst(x -> x == max(v...), v)
+  push!(β_mle, x)
+end
+
+
+### }}}

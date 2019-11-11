@@ -151,3 +151,49 @@ function cv(x, k, lower = 0, upper = 2)
 k4(x) = sin(π*x)/π*x
 end
 ### }}}
+
+### Q6 functions {{{
+Epan(u) = 3/4 * ( 1 - u^2 ) * (abs(u) <= 1)
+Epan4(u) = 15/8 * ( 1 - 7/3*u^2 ) * Epan(u)
+φ4(u) = 1/2*(3 - u^2) * φ(u)
+function KaS(β, Y, X, h, k)
+  s = 1:length(Y)
+  g(i) = l1o(β, Y, X, i, h, k)
+  trim(x) = kernel(x, X'*probit_est, h, k) >= 0.01
+
+  gv = g.(s)
+  W = ((1 .- Y).*log.(1 .- gv) .+ Y.*log.(gv)).*trim.(X'*probit_est)
+  -sum(W)
+end
+
+function l1o(β, Y, X, i, h, k)
+  n = size(X)[2]
+  num = 0
+  den = 0
+  for j in 1:n
+    if j ≠ i
+      tmp = (X[:, j] - X[:, i])' * β
+      tmp = k(tmp/h)
+      num += tmp * Y[j]
+      den += tmp
+    end
+  end
+
+  if den == 0 
+    if Y[i] == 1
+      return eps(Float64)
+    else
+      return 1 - eps(Float64)
+    end
+  end
+  if num <= 0 || num >= den
+    if Y[i] == 1
+      return 1 - eps(Float64)
+    else
+      return eps(Float64)
+    end
+  end
+
+  return num/den
+end
+### }}}
