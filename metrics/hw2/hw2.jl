@@ -174,12 +174,10 @@ aderivative(X', Y, h)
 # m(z) = optimize(α -> KaS(α.*β, Y, X, z, φ4), 0.5, 1.5)
 # m2(z) = sum((Optim.minimizer(m(z)).*β - β).^2)
 # res = Optim.minimizer(optimize(m2, 0.1, 2))
-h_caio = 0.7221
+h_caio = 0.8
 
-kas_est_epan = optimize(β -> KaS(β, Y, X, h_caio, Epan4), probit_est)
-kas_est = optimize(β -> KaS(β, Y, X, h_caio, φ4), probit_est,
-                   Optim.Options(show_trace = true))
-Optim.minimizer(res)
+kas_est_epan = optimize(β -> KaS(β, Y, X, h_caio, Epan4), probit_est,
+                        Optim.Options(show_trace = true))
 Optim.minimizer(kas_est)
 
 ## 2}}}
