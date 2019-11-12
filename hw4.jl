@@ -1,6 +1,8 @@
 using DataFrames
 using Sobol
 
+# looks good and very good analyses at the end! you get a check plus!
+
 # Q1
 function calculate_π(n::Int64)
   p = [rand(n) rand(n)]
