@@ -16,110 +16,6 @@ F(x) = cdf(Logistic(), x)
 slog(x) = x < 1e-100 ? log(1e-100) : log(x) 
 ### }}}
 
-# {{{
-# I tried very hard to make a gauss quadrature myself, julia standard gaussian
-# quadrature assumes we are integrating betwean 0 and 1 and that we are using
-# a standard normal distribution for it. And I don't really know how to
-# modify it. MATLAB function that I found let you pick the limits of
-# the integration but..... I still don't know how to integrate to infinity.
-# I didn't seem that using a very high number helps, so it look like I 
-# just missunderstood the algorithm.
-# I already spent way to much time on this, so I will go with the standard
-# function.
-### Calculating moments {{{2
-# It's hard to apreciate the beauty of this function when I lost
-# so much time on something so superfluous
-function moment_generator(n)
-  if n == 0
-    return [Dict(:μ_power => 0, :σ_power => 0, :mult => 1)]
-  else
-    expr = moment_generator(n - 1) # lagged expression
-    tmp = []
-
-    for term in expr
-      if(term[:μ_power] > 0)
-        tmp_term = copy(term)
-        tmp_term[:mult] *= tmp_term[:μ_power]
-        tmp_term[:μ_power] -= 1
-        tmp_term[:σ_power] += 1
-        push!(tmp, tmp_term)
-      end
-      term[:μ_power] += 1
-    end
-
-    # Cleaning redundant terms
-    for tmp_term in tmp
-      include = true
-      for term in expr
-        if(tmp_term[:μ_power] == term[:μ_power] &&
-           tmp_term[:σ_power] == term[:σ_power])
-          term[:mult] += tmp_term[:mult]
-          include = false
-          break
-        end
-      end
-      if include
-        push!(expr, tmp_term)
-      end
-    end
-
-    return expr
-  end
-end
-
-function normal_moments(μ, σ, n)
-  expr = moment_generator(n)
-  val = 0
-  for term in expr
-    val += term[:mult] * μ ^ term[:μ_power] * σ ^ term[:σ_power]
-  end
-  return val
-end
-### 2}}}
-
-function gauss(μ, σ, x, w)
-  n = length(x)
-  m = 2*n-1
-  mom = normal_moments.(μ, σ, 0:m);
-  rhs = [w'*x.^i for i in 0:m]
-  
-  return mom - rhs;
-end
-function fn(x,n)
-  return sum(gauss(0, 1, x[1:n], x[(n+1):(2*n)]) .^2)
-end
-f(x) = fn(x, 20)
-
-function gn(x,n)
-  m = 2*n
-  J2 = zeros(m,m)
-  for i in 1:m
-    if i == 1
-      J2[i, 1:n] = zeros(n)
-    else
-      J2[i, 1:n] = (i - 1) .* x[(n+1):m] .* x[1:n] .^ (i - 2)
-    end
-    J2[i, (n+1):m] = x[1:n] .^ (i - 1) 
-  end
-
-  y = gauss(0, 1, x[1:n], x[(n+1):m])
-  return -2 .* J2' * y
-end
-g(x) = gn(x, 20)
-gkres = QuadGK.gauss(20)
-init = vcat(gkres[1] * 2, gkres[2])
-global best = optimize(f, g, init; inplace = false)
-for i in 1:100
-  println(i)
-  res = optimize(f, g, vcat(randn(20),rand(20)); inplace = false)
-  if(res.minimum < 1)
-    break
-  elseif res.minimum < best.minimum
-    best = res
-  end
-end
-# }}}
-
 function lik_ind(β, γ, u, Y, X, Z)
   value = 1
   for t in eachindex(Y)
@@ -230,3 +126,111 @@ final_res
 # doing. My answer are similar to Julia method for integration in Question 3.
 # Question 4 don't seems to improve the log-likelihood by a lot even though we
 # greatly increased the degrees of freedom.
+
+
+
+
+# The following lines are my failed attempt to to gauss quadrature myself
+# This are not being used and can be ignored, but I spent so much time on
+# this that I figure I shouldn't just delete it
+# {{{
+# I tried very hard to make a gauss quadrature myself, julia standard gaussian
+# quadrature assumes we are integrating betwean 0 and 1 and that we are using
+# a standard normal distribution for it. And I don't really know how to
+# modify it. MATLAB function that I found let you pick the limits of
+# the integration but... I can't still properly simulate changes in μ and σ.
+# I already spent way to much time on this, so I will go with the standard
+# function.
+### Calculating moments {{{2
+# It's hard to apreciate the beauty of this function when I lost
+# so much time on something so superfluous
+function moment_generator(n)
+  if n == 0
+    return [Dict(:μ_power => 0, :σ_power => 0, :mult => 1)]
+  else
+    expr = moment_generator(n - 1) # lagged expression
+    tmp = []
+
+    for term in expr
+      if(term[:μ_power] > 0)
+        tmp_term = copy(term)
+        tmp_term[:mult] *= tmp_term[:μ_power]
+        tmp_term[:μ_power] -= 1
+        tmp_term[:σ_power] += 1
+        push!(tmp, tmp_term)
+      end
+      term[:μ_power] += 1
+    end
+
+    # Cleaning redundant terms
+    for tmp_term in tmp
+      include = true
+      for term in expr
+        if(tmp_term[:μ_power] == term[:μ_power] &&
+           tmp_term[:σ_power] == term[:σ_power])
+          term[:mult] += tmp_term[:mult]
+          include = false
+          break
+        end
+      end
+      if include
+        push!(expr, tmp_term)
+      end
+    end
+
+    return expr
+  end
+end
+
+function normal_moments(μ, σ, n)
+  expr = moment_generator(n)
+  val = 0
+  for term in expr
+    val += term[:mult] * μ ^ term[:μ_power] * σ ^ term[:σ_power]
+  end
+  return val
+end
+### 2}}}
+
+function gauss(μ, σ, x, w)
+  n = length(x)
+  m = 2*n-1
+  mom = normal_moments.(μ, σ, 0:m);
+  rhs = [w'*x.^i for i in 0:m]
+  
+  return mom - rhs;
+end
+function fn(x,n)
+  return sum(gauss(0, 1, x[1:n], x[(n+1):(2*n)]) .^2)
+end
+f(x) = fn(x, 20)
+
+function gn(x,n)
+  m = 2*n
+  J2 = zeros(m,m)
+  for i in 1:m
+    if i == 1
+      J2[i, 1:n] = zeros(n)
+    else
+      J2[i, 1:n] = (i - 1) .* x[(n+1):m] .* x[1:n] .^ (i - 2)
+    end
+    J2[i, (n+1):m] = x[1:n] .^ (i - 1) 
+  end
+
+  y = gauss(0, 1, x[1:n], x[(n+1):m])
+  return -2 .* J2' * y
+end
+g(x) = gn(x, 20)
+gkres = QuadGK.gauss(20)
+init = vcat(gkres[1] * 2, gkres[2])
+global best = optimize(f, g, init; inplace = false)
+for i in 1:100
+  println(i)
+  res = optimize(f, g, vcat(randn(20),rand(20)); inplace = false)
+  if(res.minimum < 1)
+    break
+  elseif res.minimum < best.minimum
+    best = res
+  end
+end
+# }}}
