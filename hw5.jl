@@ -2,8 +2,10 @@ using MAT
 using Distributions
 using QuadGK
 using Optim
-using NLsolve
 using LinearAlgebra
+using PDMats
+using Random
+using DataFrames
 
 ### Data Load {{{
 file = matopen("hw5.mat")
@@ -14,7 +16,17 @@ F(x) = cdf(Logistic(), x)
 slog(x) = x < 1e-100 ? log(1e-100) : log(x) 
 ### }}}
 
-### Calculating moments {{{
+# {{{
+# I tried very hard to make a gauss quadrature myself, julia standard gaussian
+# quadrature assumes we are integrating betwean 0 and 1 and that we are using
+# a standard normal distribution for it. And I don't really know how to
+# modify it. MATLAB function that I found let you pick the limits of
+# the integration but..... I still don't know how to integrate to infinity.
+# I didn't seem that using a very high number helps, so it look like I 
+# just missunderstood the algorithm.
+# I already spent way to much time on this, so I will go with the standard
+# function.
+### Calculating moments {{{2
 # It's hard to apreciate the beauty of this function when I lost
 # so much time on something so superfluous
 function moment_generator(n)
@@ -63,7 +75,7 @@ function normal_moments(μ, σ, n)
   end
   return val
 end
-### }}}
+### 2}}}
 
 function gauss(μ, σ, x, w)
   n = length(x)
@@ -73,8 +85,6 @@ function gauss(μ, σ, x, w)
   
   return mom - rhs;
 end
-gauss(0, 1, [-1.732050; 0; 1.732050], [1/6; 2/3; 1/6])
-
 function fn(x,n)
   return sum(gauss(0, 1, x[1:n], x[(n+1):(2*n)]) .^2)
 end
@@ -95,48 +105,10 @@ function gn(x,n)
   y = gauss(0, 1, x[1:n], x[(n+1):m])
   return -2 .* J2' * y
 end
-
-function hn(x, n)
-  m = 2*n
-  J2 = zeros(m,m)
-  for i in 1:m
-    if i == 1
-      J2[i, 1:n] = zeros(n)
-    else
-      J2[i, 1:n] = (i - 1) .* x[(n+1):m] .* x[1:n] .^ (i - 2)
-    end
-    J2[i, (n+1):m] = x[1:n] .^ (i - 1) 
-  end
-
-  H = zeros(m,m,m)
-  for i in 1:m
-    if i <= n
-      H[i,3:m,i] = [factorial(j-1) * x[i] ^ (j-3) * x[n+i] for j in 3:m]
-      H[(n+i),2:m,i] = [(j-1) * x[i] ^ (j-2) for j in 2:m]
-    else
-      H[i-n,2:m,i] = [(j-1) * x[i-n] ^ (j-2) for j in 2:m]
-    end
-  end
-
-  Final = zeros(m,m)
-  for i in 1:m, j in 1:m
-    # Final[i, j] = sum(J2[i
-  end
-end
-
-
-
 g(x) = gn(x, 20)
-wx = [-1.732050; 0; 1.732050; 1/6; 2/3; 1/6] 
-
-w2(n) = 1/(n+1):1/(n+1):n/(n+1)
-w = w2(9)
-d = Normal(0, 1)
-x = quantile.(d, w)
-res = nlsolve(f, g, vcat(x, w))
-res.zero
-
-best = optimize(f, g, vcat(randn(20),rand(20)); inplace = false)
+gkres = QuadGK.gauss(20)
+init = vcat(gkres[1] * 2, gkres[2])
+global best = optimize(f, g, init; inplace = false)
 for i in 1:100
   println(i)
   res = optimize(f, g, vcat(randn(20),rand(20)); inplace = false)
@@ -146,8 +118,7 @@ for i in 1:100
     best = res
   end
 end
-res = nlsolve(x -> gauss(0.1, 1, x[1:5], x[6:10]), vcat(x, w))
-gauss(0.1, 1, res.zero[1:5], res.zero[6:10])
+# }}}
 
 function lik_ind(β, γ, u, Y, X, Z)
   value = 1
@@ -159,38 +130,103 @@ function lik_ind(β, γ, u, Y, X, Z)
   return value
 end
 
-# Question 1
-function loglike_Gauss(γ, μ, u, Y, X, Z)
+### Question 1 {{{
+function loglike_gauss(γ, μ, σ_β, Y, X, Z)
   β, w = QuadGK.gauss(20)
-  β .+= μ
+  β = β .* 3 * σ_β .+ μ
 
   val = 0
   for i in axes(Y)[2]
-    ll(β) = lik_ind(β, γ, u, Y[:,i], X[:,i], Z[:,i])
+    ll(β) = lik_ind(β, γ, 0, Y[:,i], X[:,i], Z[:,i])
     val += log(w' * ll.(β))
   end
 
   return val
 end
+loglike_gauss(0, 0.1, 1, 0, data["Y"], data["X"], data["Z"])
+### }}}
 
-loglike_Gauss(0, 0.1, 0, data["Y"], data["X"], data["Z"])
-
-#Question 2
-function loglike_MC(γ, μ, u, Y, X, Z)
-  β = rand(Normal(0.1, 1), 100)
+### Question 2 {{{
+function loglike_MC(γ, μ, σ_β, σ_u, σ_βu, Y, X, Z)
+  if σ_u == 0
+    n = 100
+    Random.seed!(1234)
+    β = rand(Normal(μ, σ_β), n)
+    u = zeros(n)
+  else
+    n = 300
+    Σ = [σ_β σ_βu; σ_βu σ_u]
+    Σ = PDMat(Cholesky(Σ, :U, 0))
+    Random.seed!(1234)
+    R = rand(MvNormal(μ, Σ) , n)'
+    β = R[:,1]
+    u = R[:,2]
+  end
 
   val = 0
   for i in axes(Y)[2]
-    ll(β) = lik_ind(β, γ, u, Y[:,i], X[:,i], Z[:,i])
-    val   += log(sum(ll.(β))/100)
+    ll(β, u) = lik_ind(β, γ, u, Y[:,i], X[:,i], Z[:,i])
+    tmp = 0
+    for j in 1:n
+      tmp   += ll(β[j], u[j])/n
+    end
+    val += log(tmp)
   end
-
   return val
 end
-loglike_MC(0, 0.1, 0, data["Y"], data["X"], data["Z"])
+loglike_MC(0, 0.1, 1, 0, 0, data["Y"], data["X"], data["Z"])
 
-#Question 3
-ll(x) = loglike_Gauss(x[1], x[2], 0, data["Y"], data["X"], data["Z"])
+### }}}
 
-d = Normal()
-quantile(d, 1/20:1/20:19/20)
+### Using Julia Package for comparison {{{
+function loglike_GK(γ, μ, σ_β, σ_u, σ_βu, Y, X, Z)
+  val = 0
+  for i in axes(Y)[2]
+    ll(β, u) = lik_ind(β, γ, u, Y[:,i], X[:,i], Z[:,i]) * pdf(Normal(μ, σ_β), β)
+    int, err = quadgk(β -> ll(β, 0), -3, 3)
+    val += log(int)
+  end
+  return val
+end
+loglike_GK(0, 0.1, 1, 0, 0, data["Y"], data["X"], data["Z"])
+### }}}
+
+final_res = DataFrame(method = String[], γ_init = Float64[],
+                      β_init = Float64[], u_init = Float64[], σ_β_init = Float64[],
+                      σ_u_init = Float64[], σ_βu_init = Float64[], γ_argmax = Float64[],
+                      β_argmax = Float64[], u_argmax = Float64[], σ_β_argmax = Float64[], 
+                      σ_u_argmax = Float64[], σ_βu_argmax = Float64[],
+                      loglike = Float64[])
+### Question 3 {{{
+ll(x) = -loglike_gauss(x[1], x[2], x[3], data["Y"], data["X"], data["Z"])
+res_gauss = optimize(ll, [0.0, 0.1, 1.0])
+rg = res_gauss.minimizer
+push!(final_res, ("GaussQuad", 0, 0.1, 0, 1, 0, 0, rg[1], rg[2], 0, rg[3], 0, 0, -res_gauss.minimum))
+
+ll2(x) = -loglike_MC(x[1], x[2], x[3], 0, 0, data["Y"], data["X"], data["Z"])
+res_MC = optimize(ll2, [0.0, 0.1, 1.0], Optim.Options(show_trace = true))
+rm = res_MC.minimizer 
+push!(final_res, ("MonteCarlo", 0, 0.1, 0, 1, 0, 0, rm[1], rm[2], 0, rm[3], 0, 0, -res_MC.minimum))
+
+llgk(x) = -loglike_GK(x[1], x[2], x[3], 0, 0, data["Y"], data["X"], data["Z"])
+res_GK = optimize(llgk, [0.0, 0.1, 1.0], Optim.Options(show_trace = true))
+rj = res_GK.minimizer
+push!(final_res, ("Julia", 0, 0.1, 0, 1, 0, 0, rj[1], rj[2], 0, rj[3], 0, 0, -res_GK.minimum))
+### }}}
+
+### Question 4 {{{
+ll3(x) = -loglike_MC(x[1], x[2:3], x[4], x[5], x[6], data["Y"], data["X"], data["Z"])
+res_Q4 = optimize(ll3, [0.0, 0.1, 0.0, 1.0, 1.0, 0.1], Optim.Options(show_trace = true))
+Q4 = res_Q4.minimizer
+Σ = [Q4[4] Q4[5];Q4[5] Q4[6]]
+Σ = PDMat(Cholesky(Σ, :U, 0)).mat
+push!(final_res, ("Question4", 0, 0.1, 0, 1, 1, 0.1, Q4[1], Q4[2], Q4[3], Σ[1,1], Σ[2,2], Σ[1,2], -res_Q4.minimum))
+### }}}
+
+### Question 5 and Final Remarks
+final_res
+# Gaussian Quadrature seems to have a remarkably good results (higher log-likelihood) and
+# a much faster convergence rate, even though I was not entirely sure of what I was
+# doing. My answer are similar to Julia method for integration in Question 3.
+# Question 4 don't seems to improve the log-likelihood by a lot even though we
+# greatly increased the degrees of freedom.
