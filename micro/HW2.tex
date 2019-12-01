@@ -1,0 +1,288 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\input{structure.tex} % Include the file specifying the document structure and custom commands
+
+%----------------------------------------------------------------------------------------
+%	ASSIGNMENT INFORMATION
+%----------------------------------------------------------------------------------------
+
+\title{Game Theory: Homework} % Title of the assignment
+
+\author{Caio Figueiredo} % Author name and email address
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+\maketitle % Print the title
+
+%	PROBLEM 1 {{{
+%----------------------------------------------------------------------------------------
+
+\section{Question 1}
+\subsection{(a)} % {{{2
+
+We can rewrite $V(\mu)$ as:
+
+\[ 
+  V(\mu) = V^*(\mu) 
+\]
+\begin{equation}
+  \begin{split}
+    V^*(\mu) & = \max_{a \in \{0, 1\}}\{(\mathbb{E}(y_t) - \frac{1}{2})a + \delta \mathbb{E}(V^*(\mu'))\} \\
+             & = \max_{a \in \{0, 1\}}\{(\frac{1}{2}\mu  - \frac{1}{4})a + \delta \mathbb{E}(V^*(\mu'))\}
+  \end{split}
+\end{equation}
+
+where:
+\[
+  \mu' =  \mu \texttt{ if } a = 0
+\]
+\[
+  \mu' = \frac{\frac{3}{4}\mu}{\frac{1}{4} + \frac{1}{2}\mu} \texttt{ if } a = 1, y = 1
+\]
+\[
+  \mu' = \frac{\frac{1}{4}\mu}{\frac{3}{4} - \frac{1}{2}\mu} \texttt{ if } a = 1, y = 0
+\]
+
+Now we can use the standard Recursive Dynamic proof, define:
+\[
+  T(f)(x) = \max_{a \in \{0, 1\}}\{(\frac{1}{2}\mu  - \frac{1}{4})a + \delta f(\mu')
+\]
+
+$T$ maps weakly increasing functions in weakly increasing functions because $\mu'$
+is stricly increasing in $\mu$ and $(\frac{1}{2}\mu  - \frac{1}{4})a$ is stricly
+increasing as long as $a = 1$ and constant as long as $a = 0$.
+
+Therefore by the Contraction Mapping Theorem the fix point of $T$, which is $V^*$
+is weakly increasing. Moreover, since $V^*$ is weakly increasing and $(1 - \delta) > 0$,
+then $V$ is weakly increasing.
+%2}}}
+
+\subsection{b} %{{{2
+
+First notice that we can use the same argument of (a) to show that $V^*$ is continuous.
+
+Now notice that for $\mu = 0$, $\mu' = 0 \forall a,y$ and for $\mu = 1$,
+$\mu' = 0 \forall a,y$, therefore:
+
+\[
+  \begin{split}
+    V^*(0) & =  \max_{a \in \{0, 1\}}\{- \frac{1}{4}a + \delta V^*(0) \} \\
+           & = \frac{\max_{a \in \{0, 1\}}\{- \frac{1}{4}a\}}{(1 - \delta)} \\
+           & = 0 \\
+    V(0)   & = 0
+  \end{split}
+  \ \    
+  \begin{split}
+    V^*(1) & =  \max_{a \in \{0, 1\}}\{\frac{1}{4}a + \delta V^*(1) \} \\
+           & = \frac{\max_{a \in \{0, 1\}}\{\frac{1}{4}a\}}{(1 - \delta)} \\
+           & = \frac{1}{4(1 - \delta)} > 0 \\
+    V(1)   & = \frac{1}{4}
+  \end{split}
+\]
+
+Since $V$ is weakly increasing that must be $\mu^* \ge 0$ such that for for all 
+$0 \ge \mu < \mu^*, V(\mu) = 0$, and for all $1 \ge \mu > \mu, V(\mu) > 0$.
+
+Moreover, $0 \ge \mu < \mu^*$, optimal $a$ is $0$ and for $1 \ge \mu > \mu$, 
+optimal $a$ is $1$. Since $V^*$ is continuous at $\mu^*$ the agent is indifferent.
+%2}}}
+% }}}
+
+%	PROBLEM 2 {{{
+%----------------------------------------------------------------------------------------
+\section{Question 2}
+\label{sec:Question 2}
+
+\[
+  \begin{split}
+  |V^c(\delta, \theta) - V(\delta, \theta)| & = \left|
+      \sum_{t=0}^{\infty} \delta^t a^c_t 
+        \left(\sum_{i = 1}^{\infty} y_i P_{\theta^*}(y_i|y_1, \ldots, y_t)\right) - 
+      \sum_{t=0}^{\infty} \delta^t a_t 
+        \left(\sum_{i = 1}^{\infty} y_i P_{\theta^*}(y_i|y_1, \ldots, y_t)\right)
+      \right| \\
+    & \le \left|
+        \sum_{t=0}^{\infty} \delta^t a^c_t 
+          \left(\sum_{i = 1}^{\infty} y_i P_{\theta^*}(y_i|y_1, \ldots, y_t)\right) - 
+        \sum_{t=0}^{\infty} \delta^t a_t 
+          \left(\sum_{i = 1}^{\infty} y_i \mu(y_i|y_1, \ldots, y_t)\right)
+        \right| + \\ 
+      & \qquad\quad \left|
+        \sum_{t=0}^{\infty} \delta^t a_t 
+          \left(\sum_{i = 1}^{\infty} y_i P_{\theta^*}(y_i|y_1, \ldots, y_t)\right) - 
+        \sum_{t=0}^{\infty} \delta^t a_t 
+          \left(\sum_{i = 1}^{\infty} y_i \mu(y_i|y_1, \ldots, y_t)\right)
+        \right| \\
+    & \le \left(
+        \sum_{t=0}^{\infty} \delta^{2t} \max_{y \in Y^{\infty}} y^2
+            \left(\sum_{i = 1}^{\infty} |
+                P_{\theta^*}(y_i|y_1, \ldots, y_t)
+                \mu(y_i|y_1, \ldots, y_t)|\right)^2\right)^{1/2} + \\
+      & \qquad\quad \left(
+        \sum_{t=0}^{\infty} \delta^{2t} \max_{y \in Y^{\infty}} y^2
+            \left(\sum_{i = 1}^{\infty} |
+                P_{\theta^*}(y_i|y_1, \ldots, y_t)
+                \mu(y_i|y_1, \ldots, y_t)|\right)^2\right)^{1/2} + \\
+  \end{split}
+\]
+%}}}
+
+%	PROBLEM 3 {{{
+%----------------------------------------------------------------------------------------
+
+\section{Question 3}%
+\label{sec:Question 3}
+
+For simplification:
+
+\[
+\begin{split}
+  P_{\gamma}(y) & = \mu P_{\gamma}(y| \theta = 1) + (1 - \mu)P_{\gamma}(y|\theta = -1) \\
+  P_{\gamma}(1) & = \mu (1/2 + \gamma) + (1 - \mu)(1/2 \gamma) \\
+                & = 1/2 + \gamma(2\mu - 1) \\
+  P_{\gamma}(0) & = 1/2 - \gamma(2\mu - 1)
+\end{split}
+\]
+
+Notice:
+
+\[
+  \lim_{\gamma \to 0} P_{\gamma}(0) = \lim_{\gamma \to 0} P_{\gamma}(1) = \frac{1}{2}
+\]
+
+The Baseyian updates are:
+
+\[
+  \mu_\gamma(1) = \frac{(1/2 + \gamma)\mu}{P_\gamma(1)}
+\]
+\[
+  \mu_\gamma(0) = \frac{(1/2 - \gamma)\mu}{P_\gamma(0)}
+\]
+
+Therefore:
+
+\[
+  \lim_{\gamma \to 0} \mu_\gamma(0) = \lim_{\gamma \to 0} \mu_\gamma(1) = \mu
+\]
+
+and:
+
+\[
+  \lim_{\gamma \to 0} V(\mu_\gamma(0)) = \lim_{\gamma \to 0} V(\mu_\gamma(1)) = V(\mu)
+\]
+
+%We can now evaluate $V_(\mu_\gamma(0))$:
+
+%\[
+  %V_(\mu_\gamma(0)) & = 
+    %\max_{a \in [0,1]} \frac{(1/2 - \gamma)\mu}{P_\gamma(0)}u(a, 1) +
+      %\frac{P_\gamma(0) - (1/2 - \gamma)\mu}{P_\gamma(0)}u(a, -1) \\
+                    %& = 
+%\]
+
+Finally:
+
+\[
+\begin{split}
+  V_\gamma(\mu) & = P_\gamma(0)V(\mu_\gamma(0)) + P_\gamma(1)V(\mu_\gamma(1)) \\
+                & = (1/2 + \gamma(2\mu -1))V(\mu_\gamma(1)) +
+                    (1/2 - \gamma(2\mu -1))V(\mu_\gamma(0))
+\end{split}
+\]
+
+and:
+
+\[
+  \lim_{\gamma \to 0} V_\gamma(\mu) = V(\mu)
+\]
+
+Whice make the question identity equals the derivative of $V_\gamma$ in relation
+to $\gamma$:
+
+\[
+\frac{\partial V_\gamma(\mu)}{\partial \gamma} =
+\lim_{\gamma \to 0} \frac{V_\gamma(\mu) - V(\mu)}{\gamma}
+\]
+
+We are left to prove that this derivative is zero at $\gamma$ = 0:
+
+\[
+\begin{split}
+  \frac{\partial V_\gamma(\mu)}{\partial \gamma}(\gamma) & =
+    (2\mu -1)V(\mu_\gamma(1)) +
+    \frac{\partial V(\mu_\gamma(1))}{\partial \gamma}(1/2 + \gamma(2\mu - 1)) - \\
+    & \qquad\quad
+    (2\mu -1)V(\mu_\gamma(0)) +
+    \frac{\partial V(\mu_\gamma(0))}{\partial \gamma}(1/2 - \gamma(2\mu - 1)) \\
+  \frac{\partial V_\gamma(\mu)}{\partial \gamma}(0) & =
+    (2\mu -1)V(\mu) +
+    \frac{\partial V(\mu_0(1))}{\partial \gamma}(1/2) -
+    (2\mu -1)V(\mu) +
+    \frac{\partial V(\mu_0(0))}{\partial \gamma}(1/2) \\
+  & =
+    1/2 \left(\frac{\partial V(\mu_0(0))}{\partial \gamma} +
+      \frac{\partial V(\mu_0(1))}{\partial \gamma}\right)
+\end{split}
+\]
+
+But:
+
+\[
+\begin{split}
+  V(\mu_\gamma(1)) & = \mu_\gamma u(a_1^*, 1) + (1 - \mu_\gamma) u(a_1^*, -1) \\
+  & = P_\gamma(1)^{-1} 
+    [(1/2 + \gamma)\mu u(a_1^*, 1) + \gamma(2\mu - 2)\mu u(a_1^*, -1)] \\
+  \frac{\partial V(\mu_\gamma)}{\partial \gamma} & = P_\gamma(1)^{-1} 
+    [\mu u(a_1^*) + (2\mu - 2)u(a_1^*, -1)] + \\
+    & \qquad\quad
+    \frac{1 - 2\mu}{(1/2 + \gamma(2\mu -1))^2} 
+    [(1/2 + \gamma)\mu u(a_1^*,1) + \gamma(2\mu - 2) u(a_1^*, -1)] \\
+  \frac{\partial V(\mu_0)}{\partial \gamma} & = 
+    2[\mu u(a_1^*) + (2\mu - 2)u(a_1^*, -1)] +
+    (4 - 8\mu)[1/2\mu u(a_1^*,1)]
+\end{split}
+\]
+
+where $a_1^*$ is the argmax of $V$ for $\gamma = 0$ and:
+
+\[
+\begin{split}
+  V(\mu_\gamma(0)) & =  P_\gamma(0)^{-1} 
+    [(1/2 - \gamma)\mu u(a_0^*, 1) - \gamma(2\mu - 2)\mu u(a_0^*, -1)] \\
+  \frac{\partial V(\mu_\gamma)}{\partial \gamma} & = P_\gamma(0)^{-1} 
+    [-\mu u(a_0^*) - (2\mu - 2)u(a_0^*, -1)] + \\
+    & \qquad\quad
+    \frac{2\mu - 1}{(1/2 + \gamma(2\mu -1))^2}
+    [(1/2 - \gamma)\mu u(a_0^*,1) - \gamma(2\mu - 2) u(a_0^*, -1)] \\
+  \frac{\partial V(\mu_0)}{\partial \gamma} & = 
+    2[-\mu u(a_0^*) - (2\mu - 2)u(a_0^*, -1)] +
+    (8\mu - 4)[1/2\mu u(a_0^*,1)]
+\end{split}
+\]
+
+and since $a_1^* \to a_0^*$ as $\gamma \to 0$, by what we have seem before,
+we have:
+
+\[
+\begin{split}
+  \frac{\partial V(\mu_0(0))}{\partial \gamma} +
+    \frac{\partial V(\mu_0(1))}{\partial \gamma} & = 0 \\
+  \frac{\partial V_\gamma(\mu)}{\partial \gamma}(0) & = 0 \\
+  \lim_{\gamma \to 0} \frac{V_\gamma(\mu) - V(\mu)}{\gamma} & = 0
+\end{split}
+\]
+
+$\hfill\blacksquare$ 
+
+
+
+%}}}
+
+%	PROBLEM 4 {{{
+%----------------------------------------------------------------------------------------
+
+% }}}
+\end{document}
