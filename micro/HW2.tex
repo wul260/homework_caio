@@ -26,7 +26,7 @@
 We can rewrite $V(\mu)$ as:
 
 \[ 
-  V(\mu) = V^*(\mu) 
+  V(\mu) = (1 - \delta)V^*(\mu) 
 \]
 \begin{equation}
   \begin{split}
@@ -48,14 +48,14 @@ where:
 
 Now we can use the standard Recursive Dynamic proof, define:
 \[
-  T(f)(x) = \max_{a \in \{0, 1\}}\{(\frac{1}{2}\mu  - \frac{1}{4})a + \delta f(\mu')
+  T(f)(x) = \max_{a \in \{0, 1\}}\{(\frac{1}{2}\mu  - \frac{1}{4})a + \delta f(\mu') \}
 \]
 
 $T$ maps weakly increasing functions in weakly increasing functions because $\mu'$
 is stricly increasing in $\mu$ and $(\frac{1}{2}\mu  - \frac{1}{4})a$ is stricly
 increasing as long as $a = 1$ and constant as long as $a = 0$.
 
-Therefore by the Contraction Mapping Theorem the fix point of $T$, which is $V^*$
+Therefore by the Contraction Mapping Theorem the fix point of $T$, which is $V^*$,
 is weakly increasing. Moreover, since $V^*$ is weakly increasing and $(1 - \delta) > 0$,
 then $V$ is weakly increasing.
 %2}}}
@@ -64,8 +64,8 @@ then $V$ is weakly increasing.
 
 First notice that we can use the same argument of (a) to show that $V^*$ is continuous.
 
-Now notice that for $\mu = 0$, $\mu' = 0 \forall a,y$ and for $\mu = 1$,
-$\mu' = 0 \forall a,y$, therefore:
+Now notice that for $\mu = 0$, $\mu' = 0\ \forall a,y$ and for $\mu = 1$,
+$\mu' = 1 \forall a,y$, therefore:
 
 \[
   \begin{split}
@@ -86,7 +86,7 @@ $\mu' = 0 \forall a,y$, therefore:
 Since $V$ is weakly increasing that must be $\mu^* \ge 0$ such that for for all 
 $0 \ge \mu < \mu^*, V(\mu) = 0$, and for all $1 \ge \mu > \mu, V(\mu) > 0$.
 
-Moreover, $0 \ge \mu < \mu^*$, optimal $a$ is $0$ and for $1 \ge \mu > \mu$, 
+Moreover, $0 \le \mu < \mu^*$, optimal $a$ is $0$ and for $\mu^* < \mu \le 1$, 
 optimal $a$ is $1$. Since $V^*$ is continuous at $\mu^*$ the agent is indifferent.
 %2}}}
 % }}}
@@ -116,18 +116,33 @@ optimal $a$ is $1$. Since $V^*$ is continuous at $\mu^*$ the agent is indifferen
         \sum_{t=0}^{\infty} \delta^t a_t 
           \left(\sum_{i = 1}^{\infty} y_i \mu(y_i|y_1, \ldots, y_t)\right)
         \right| \\
-    & \le \left(
-        \sum_{t=0}^{\infty} \delta^{2t} \max_{y \in Y^{\infty}} y^2
+    & \le 2\left(
+        \sum_{t=0}^{\infty} \delta^{2t} \max_{y \in Y} y^2
             \left(\sum_{i = 1}^{\infty} |
                 P_{\theta^*}(y_i|y_1, \ldots, y_t)
                 \mu(y_i|y_1, \ldots, y_t)|\right)^2\right)^{1/2} + \\
-      & \qquad\quad \left(
-        \sum_{t=0}^{\infty} \delta^{2t} \max_{y \in Y^{\infty}} y^2
-            \left(\sum_{i = 1}^{\infty} |
-                P_{\theta^*}(y_i|y_1, \ldots, y_t)
-                \mu(y_i|y_1, \ldots, y_t)|\right)^2\right)^{1/2} + \\
+    & \le 2\max_{y \in Y} |y|^2 \left(\sum_{t = 0}^{\infty} \delta^{2t}\right)^{1/2} 
+        \left(\sum_{t = 0}^{\infty} \sup_{y \in Y}\{
+            P_{\theta^*}(y|y_1, \ldots, y_t)
+                \mu(y|y_1, \ldots, y_t)\}^2 |y|\right)^{1/2} \\
+    & \le \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+        \left(\sum_{t=0}^{\infty} \frac{1}{2}KL(\theta^*|\mu)\right)^{1/2} \\
+    & \le \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+        \left(\sum_{t=0}^{\infty} -\ln e^{-(1 -\delta)^{2(t+1)}}\right)^{1/2} \\
+    & = \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+        \frac{1 -\delta}{(1 - (1 - \delta)^2)^{1/2}} \\
+    & = 2|y|^{1/2}\max_{y \in Y} |y|^2
+        \left(\frac{1 -\delta}{(1 + \delta)(1 - (1 - \delta)^2)}\right)^{1/2} \\
   \end{split}
 \]
+
+Finally, notice that $1 - \delta \to 0$ as $\delta \to 1$ while
+$(1 + \delta)(1 - (1 - \delta)^2) \to 2$. Therefore
+
+\[
+  \lim_{\delta \to 1} V^c(\delta, \theta) - V(\delta, \theta)) = 0
+\]
+
 %}}}
 
 %	PROBLEM 3 {{{
@@ -235,12 +250,12 @@ But:
   V(\mu_\gamma(1)) & = \mu_\gamma u(a_1^*, 1) + (1 - \mu_\gamma) u(a_1^*, -1) \\
   & = P_\gamma(1)^{-1} 
     [(1/2 + \gamma)\mu u(a_1^*, 1) + \gamma(2\mu - 2)\mu u(a_1^*, -1)] \\
-  \frac{\partial V(\mu_\gamma)}{\partial \gamma} & = P_\gamma(1)^{-1} 
+  \frac{\partial V(\mu_\gamma(1))}{\partial \gamma} & = P_\gamma(1)^{-1} 
     [\mu u(a_1^*) + (2\mu - 2)u(a_1^*, -1)] + \\
     & \qquad\quad
     \frac{1 - 2\mu}{(1/2 + \gamma(2\mu -1))^2} 
     [(1/2 + \gamma)\mu u(a_1^*,1) + \gamma(2\mu - 2) u(a_1^*, -1)] \\
-  \frac{\partial V(\mu_0)}{\partial \gamma} & = 
+  \frac{\partial V(\mu_0(1))}{\partial \gamma} & = 
     2[\mu u(a_1^*) + (2\mu - 2)u(a_1^*, -1)] +
     (4 - 8\mu)[1/2\mu u(a_1^*,1)]
 \end{split}
@@ -252,12 +267,12 @@ where $a_1^*$ is the argmax of $V$ for $\gamma = 0$ and:
 \begin{split}
   V(\mu_\gamma(0)) & =  P_\gamma(0)^{-1} 
     [(1/2 - \gamma)\mu u(a_0^*, 1) - \gamma(2\mu - 2)\mu u(a_0^*, -1)] \\
-  \frac{\partial V(\mu_\gamma)}{\partial \gamma} & = P_\gamma(0)^{-1} 
+  \frac{\partial V(\mu_\gamma(0))}{\partial \gamma} & = P_\gamma(0)^{-1} 
     [-\mu u(a_0^*) - (2\mu - 2)u(a_0^*, -1)] + \\
     & \qquad\quad
-    \frac{2\mu - 1}{(1/2 + \gamma(2\mu -1))^2}
+    \frac{2\mu - 1}{(1/2 - \gamma(2\mu -1))^2}
     [(1/2 - \gamma)\mu u(a_0^*,1) - \gamma(2\mu - 2) u(a_0^*, -1)] \\
-  \frac{\partial V(\mu_0)}{\partial \gamma} & = 
+  \frac{\partial V(\mu_0(0))}{\partial \gamma} & = 
     2[-\mu u(a_0^*) - (2\mu - 2)u(a_0^*, -1)] +
     (8\mu - 4)[1/2\mu u(a_0^*,1)]
 \end{split}
@@ -277,6 +292,26 @@ we have:
 
 $\hfill\blacksquare$ 
 
+\subsection{b}
+
+From (a) we can conclude:
+
+%\[
+%\begin{split}
+  %\frac{\partial V_\gamma(\mu)}{\partial \gamma}(\gamma) & =
+    %(2\mu -1)\left[
+  %P_\gamma(1)^{-1} 
+    %[(1/2 + \gamma)\mu u(a_1^*, 1) + \gamma(2\mu - 2)\mu u(a_1^*, -1)] \\
+  %P_\gamma(0)^{-1} 
+    %[(1/2 - \gamma)\mu u(a_0^*, 1) - \gamma(2\mu - 2)\mu u(a_0^*, -1)] \\
+
+
+
+    %\frac{\partial V(\mu_\gamma(1))}{\partial \gamma}(1/2 + \gamma(2\mu - 1)) - \\
+    %& \qquad\quad
+    %\frac{\partial V(\mu_\gamma(0))}{\partial \gamma}(1/2 - \gamma(2\mu - 1)) \\
+%\end{split}
+%\]
 
 
 %}}}
