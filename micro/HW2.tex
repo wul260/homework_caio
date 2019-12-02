@@ -210,7 +210,12 @@ that the agent eventually takes action $0$ forever. Remember, $\Pn(-\infty) = 1$
 \begin{split}
   \Pn(n)            & = \frac{1}{4}\Pn(n + 1) + \frac{3}{4}\Pn(n - 1) \\
   \Pn(n + 1)        & = 4\Pn(n) - 3\Pn(n-1) \\
-  \Pn(n + 1) - \Pn(n)& = 3(\Pn(n) - \Pn(n-1)) 
+  \Pn(n + 1)-\Pn(n) & = 3(\Pn(n) - \Pn(n-1)) \\
+  \Pn(n + 2)-\Pn(n+1)&= 3^2(\Pn(n) - \Pn(n-1)) \\
+  \Pn(\infty)-\Pn(\infty)&= 3^\infty(\Pn(n) - \Pn(n-1)) \\
+  0                 & = \Pn(n) - \Pn(n-1) \\
+  \Pn(n)            & = \Pn(n-1) \\
+  \Pn(0)            & = \Pn(-1) = \ldots = \Pn(-\infty) = 1 \\
 \end{split}
 \]
 %2}}}
