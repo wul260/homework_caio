@@ -528,17 +528,17 @@ And therefore by Berk Theorem he learns the true state with probability 1.
 
 \begin{equation}
 \begin{split}
-  \Pth(\ydots)     & = \pi_0(y_1) \prodtau \Pth(y_{t+1} |y_t) \\
+  \Pth(\ydots)     & = \pi_0(y_1) \prodtau \Pth(y_{\tau+1} |y_\tau) \\
   \PHI(\ydots)     & = \log \frac{\mu(\theta')}{\mu(\theta)} + \sumtau
-                       \log \frac{\Pthp(y_{t+1}|y_t)}{\Pth(y_{t+1}|y_t)} \\
-   \sumtau \log \frac{\Pthp(y_{t+1}|y_t)}{\Pth(y_{t+1}|y_t)} & =
+                       \log \frac{\Pthp(y_{\tau+1}|y_\tau)}{\Pth(y_{\tau+1}|y_\tau)} \\
+   \sumtau \log \frac{\Pthp(y_{t+1}|y_\tau)}{\Pth(y_{\tau+1}|y_\tau)} & =
                        \sum_{y, y'} (t+1) \rho_{y, y'}(\ydots)
                        \log \frac{\Pthp(y'|y)}{\Pth(y'|y)}
 \end{split}
 \end{equation}
 
 But since $\rho_{y, y'}(\ydots) = \rho_{y, y'}(y_1', \ldots, y_t')$ we
-have $\mu(\theta| \ydots) = \mu(\theta | y_1', \ldots, y_t') 
+have $\mu^t(\theta| \ydots) = \mu^t(\theta | y_1', \ldots, y_t') 
 \forall\ \theta \in \Theta$.
 %2}}}
 
@@ -548,10 +548,36 @@ have $\mu(\theta| \ydots) = \mu(\theta | y_1', \ldots, y_t')
 \begin{split}
   \rho_{y,y'}(\ydots) \xrightarrow{P} \theta^*(y, y') & =
                      \pi^*(y) P_{\theta^*}(y'|y) \\
-  \PHI(\ydots) = \log \frac{\mu(\theta')}{\mu(\theta)} +
-      \sum_{y, y'}(t-1) P_{y, y'} \log \frac{}{}
+  \PHI(\ydots) & = \log \frac{\mu(\theta')}{\mu(\theta)} +
+      \sum_{y, y'}(t-1) \rho_{y, y'} \log \frac{\Pthp(y'|y)}{\Pth(y'|y)} \\
+               & = \log \frac{\mu(\theta')}{\mu(\theta)} +
+      \sum_y \sum_{y'}(t-1) \rho_{y, y'} \log \frac{\Pthp(y'|y)}{\Pth(y'|y)}
 \end{split}
 \end{equation}
+
+But:
+
+\begin{equation}
+\begin{split}
+  \sum_{y'}(t-1) \rho_{y, y'} \log \frac{\Pthp(y'|y)}{\Pth(y'|y)} & \to
+  \sum_{y'} \pi^*(y) P_{\theta^*}(y'|y) \log \frac{\Pthp(y'|y)}{\Pth(y'|y)} \\
+    & = \pi^*(y)(KL(P_{\theta^*}(\cdot | y) | \Pth(\cdot |y))
+           - KL(P_\theta^*(\cdot | y) | \Pth (\cdot | y)))
+\end{split}
+\end{equation}
+
+Therefore:
+
+\begin{equation}
+\begin{split}
+  \sum_y \sum_{y'}(t-1) P_{y, y'} \log \frac{\Pthp(y'|y)}{\Pth(y'|y)} & \to
+      \sum_y \pi^*(y)(KL(P_{\theta^*}(\cdot | y) | \Pth(\cdot | y))
+        - \sum_y KL(P_\theta^*(\cdot | y) | \Pth (\cdot | y)))
+\end{split}
+\end{equation}
+
+And so for $\theta \not\in \Theta^*$ and $\theta' \in \Theta^*$
+$\PHI \to \infty$ which implies that $\mu(\Theta^* | \ydots) \xrightarrow{P} 1$ 
 %2}}}
 %}}}
 
@@ -594,9 +620,9 @@ P(\theta = 1|y = 1/2) & = \frac{[P(y^1 = 1, y^0 = 0 | \theta = 1) +
                       & = \frac{10\mu}{(1 + 2\mu)^2 + (3 - 2\mu)^2} \\
 \text{Finally, and most importantly, if $\alpha = 1$: } & \\
 P(\theta = 1|y = 1)   & = \frac{3\mu}{1 + 2\mu} \\
-P(\theta = 1|y = 0)   & = \frac{\mu}{1 - 2\mu} \\
+P(\theta = 1|y = 0)   & = \frac{\mu}{3 - 2\mu} \\
 \text{symmetrically, if $\alpha = 0$: } & \\
-P(\theta = 1|y = 1)   & = \frac{\mu}{1 - 2\mu} \\
+P(\theta = 1|y = 1)   & = \frac{\mu}{3 - 2\mu} \\
 P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu}
 \end{split}
 \end{equation}
