@@ -105,9 +105,9 @@ $\mu_0^n$ the belief after observing $y = 0, n$ times in a row. It easy to show 
 
 It is also simple to show that $\mu_0^n \to 0$ as $n \to \infty$. Therefore:
 we have for any $\epsilon > 0$, in particular, for $\epsilon = \mu^*, \exists
-n^* \in \mathcal{N}$ such that for any $n > n^*, \mu_0^n < \mu^*$.
+n^* \in \mathbb{N}$ such that for any $n > n^*, \mu_0^n < \mu^*$.
 
-We already stablish that one below $\mu^*$ the agent always choose $a = 0$, which implies
+We already stablish that once below $\mu^*$ the agent always choose $a = 0$, which implies
 he don't update his belief anymore and therefore always choose $a = 0$. Since $n^*$ is a
 finite number the probability of observing the bad signal $n^*$ times is positive and this
 part of the statement is proven.
@@ -157,19 +157,18 @@ We have:
   \Pn(s) = P(y=1)\Pn(s+1) + P(y=0)\Pn(s-1)
 \]
 
-Which follows from the definition of $\Pn$. Moreover, since $\theta = 1,
+Which follows from the definition of $\Pn$. Moreover since $\theta = 1:
 P(y=1) = \frac{3}{4}$ and $P(y=0) = \frac{1}{4}$. For simplification we
 further assume that the prior $\mu$ is such that at $s = 0$ one bad return
 is enough to bring our belief below $\mu^*$, which implies that $\Pn(-1) = 0$.
 This is WLOG because if the affirmation hold for a $\mu$ this low is must also
-holds for higher $\mu$s
-Therefore:
+holds for higher $\mu$.  Therefore:
 
 \[
 \begin{split}
   \Pn(0)            & = \frac{3}{4}\Pn(1) \\
                     & = \frac{3}{4}(\frac{3}{4}\Pn(2) + \frac{1}{4}\Pn(0)) \\
-  \frac{13}{16}\Pn(0)& = \frac{13}{9}\Pn(2) \\
+  \frac{13}{16}\Pn(0)& = \frac{9}{16}\Pn(2) \\
   \text{Therefore:} & \\
   \Pn(1)            & = \frac{4}{3}\Pn(0)\\
   \Pn(2)            & = \frac{13}{9}\Pn(0)\\
@@ -185,7 +184,7 @@ Moreover:
   \Pn(n+1)          & = \frac{4}{3}\Pn(n) - \frac{1}{3}\Pn(n - 1) \\
   \Pn(n+1) - \frac{1}{3}\Pn(n) & = \Pn(n) - \frac{1}{3}\Pn(n - 1) \\
                     & = \Pn(2) - \frac{1}{3}\Pn(1) \\
-                    & = \frac{13}{9}\Pn(0) - \frac{1}{3}\frac{3}{4}\Pn(0)) \\
+                    & = \frac{13}{9}\Pn(0) - \frac{1}{3}\frac{4}{3}\Pn(0)) \\
   \Pn(0)            & = \Pn(n+1) - \frac{1}{3}\Pn(n) \\
 \end{split}
 \]
@@ -231,6 +230,7 @@ that the agent eventually takes action $0$ forever. Remember, $\Pn(-\infty) = 1$
 \newcommand{\sumi}{\sum_{i=1}^\infty}
 \newcommand{\Pth}{P_{\theta^*}(y_i|y_1, \ldots, y_t)}
 \newcommand{\muth}{\mu(y_i|y_1, \ldots, y_t)}
+\newcommand{\maxy}{\max_{y \in Y} |y|}
 \[
   \begin{split}
   |V^c(\delta, \theta) - V(\delta, \theta)| & = \left|
@@ -246,19 +246,19 @@ that the agent eventually takes action $0$ forever. Remember, $\Pn(-\infty) = 1$
             \sumt \delta^t a_t \left(\sumi y_i \muth\right)
             \right| \\
     & \le 2\left(
-        \sumt \delta^{2t} \max_{y \in Y} y^2
+        \sumt \delta^{2t} \maxy^2
             \left(\sumi |\Pth \muth|\right)^2\right)^{1/2} + \\
-    & \le 2\max_{y \in Y} |y|^2 \left(\sumt \delta^{2t}\right)^{1/2} 
+    & \le 2\maxy \left(\sumt \delta^{2t}\right)^{1/2} 
         \left(\sumt \sup_{y \in Y}\{
             P_{\theta^*}(y|y_1, \ldots, y_t)
             \mu(y|y_1, \ldots, y_t)\}^2 |y|\right)^{1/2} \\
-    & \le \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+    & \le \frac{2|y|^{1/2}\maxy}{(1 - \delta^2)^{1/2}} 
           \left(\sumt \frac{1}{2}KL(\theta^*|\mu)\right)^{1/2} \\
-    & \le \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+    & \le \frac{2|y|^{1/2}\maxy}{(1 - \delta^2)^{1/2}} 
           \left(\sumt -\ln e^{-(1 -\delta)^{2(t+1)}}\right)^{1/2} \\
-    & = \frac{2|y|^{1/2}\max_{y \in Y} |y|^2}{(1 - \delta^2)^{1/2}} 
+    & = \frac{2|y|^{1/2}\maxy}{(1 - \delta^2)^{1/2}} 
           \frac{1 -\delta}{(1 - (1 - \delta)^2)^{1/2}} \\
-    & = 2|y|^{1/2}\max_{y \in Y} |y|^2
+    & = 2|y|^{1/2}\maxy
           \left(\frac{1 -\delta}{(1 + \delta)(1 - (1 - \delta)^2)}\right)^{1/2} \\
   \end{split}
 \]
@@ -278,6 +278,7 @@ $(1 + \delta)(1 - (1 - \delta)^2) \to 2$. Therefore
 \section{Question 3}%
 \label{sec:Question 3}
 
+\subsection{(a)} %{{{2
 For simplification:
 
 \[
@@ -295,7 +296,7 @@ Notice:
   \lim_{\gamma \to 0} P_{\gamma}(0) = \lim_{\gamma \to 0} P_{\gamma}(1) = \frac{1}{2}
 \]
 
-The Baseyian updates are:
+The Bayesian updates are:
 
 \[
   \mu_\gamma(1) = \frac{(1/2 + \gamma)\mu}{P_\gamma(1)}
@@ -341,7 +342,7 @@ and:
   \lim_{\gamma \to 0} V_\gamma(\mu) = V(\mu)
 \]
 
-Whice make the question identity equals the derivative of $V_\gamma$ in relation
+Which make the question identity equals the derivative of $V_\gamma$ in relation
 to $\gamma$:
 
 \[
@@ -388,7 +389,7 @@ But:
 \end{split}
 \]
 
-where $a_1^*$ is the argmax of $V$ for $\gamma = 0$ and:
+Where $a_1^*$ is the argmax of $V$ for $\gamma = 0$ and:
 
 \[
 \begin{split}
@@ -405,7 +406,7 @@ where $a_1^*$ is the argmax of $V$ for $\gamma = 0$ and:
 \end{split}
 \]
 
-and since $a_1^* \to a_0^*$ as $\gamma \to 0$, by what we have seem before,
+And since $a_1^* \to a_0^*$ as $\gamma \to 0$, by what we have seem before,
 we have:
 
 \[
@@ -417,34 +418,243 @@ we have:
 \end{split}
 \]
 
-$\hfill\blacksquare$ 
+$\hfill\blacksquare$
 
-\subsection{b}
+%2}}}
 
-From (a) we can conclude:
+\subsection{(b)} %{{{2
 
-%\[
+The agent choose $\gamma$ to maximize:
+
+\begin{equation}
+  \max_\gamma V_\gamma(\mu) - \beta\gamma
+\end{equation}
+
+Notice that as long as $\frac{\partial V_\gamma}{\partial \gamma}(\mu) < \beta$ the agent
+has no incentive to invest in learning. Moreover, as $\mu \to 0, \gamma \to 0$ since
+at $\mu = 0$ you have no incentive to learn ($\gamma = 0$) and 
+$\frac{\partial V_\gamma}{\partial \gamma}(\mu)$ is continuous and $\mu$.
+
+From question (a) we have that: $\frac{\partial V_\gamma}{\partial \gamma}(\mu) \to 0$
+as $\gamma \to 0$, therefore: $\exists \bar\mu$ such that $\forall\ \mu \in [0, \bar\mu]$
+$\frac{\partial V_\gamma}{\partial \gamma}(\mu) < \beta$, which imply that the optimal choice
+of $\gamma$ is 0.
+
+It is also easy to see that if $\gamma = 0$ the agent doesn't update and then $\mu_t = \mu_0$
+for all $t$. Which concludes our proof.
+
+%2}}}
+
+\subsection{(c)} %{{{2
+
+I assume that $1/4 < \mu_0 < 3/4$ and that the agent is still myopic. 
+Define:
+\begin{equation}
+  u(a,\theta) = \frac{3}{16}a\theta
+\end{equation}
+
+Which is $0$ as long as the agent choose no $a = 0$, positive as long as he chooses $a = 1$
+and the state $\theta = 1$, negative otherwise. Therefore if $\mu > 1/2$ he chooses $a = 1$,
+but choose $a = 0$ otherwise.
+
+His expected payoff is:
+
+\begin{equation}
+\begin{split}
+  E(u(a,\theta) | \mu) - \gamma^3 & = \\
+  = & P(y = 1 |\mu, \gamma)\max\{\mathbb{E}(u(1,\theta) | \mu_\gamma(1)), 0\} + \\
+    &\qquad P(y = 0 |\mu, \gamma)\max\{\mathbb{E}(u(1,\theta) | \mu_\gamma(0)), 0\} \\
+  = & [\mu(1/2 + \gamma) + (1 - \mu)(1/2 -\gamma)] \frac{3}{16}
+      \frac{\mu - 1/2 + \gamma}{1/2 + 2\gamma\mu - \gamma} - \gamma^3  \\
+  = & [1/2 + 2\gamma\mu - \gamma] \frac{3}{16}\frac{\mu - 1/2 + \gamma}{1/2 + 2\gamma\mu - \gamma} - \gamma^3 \\
+  = & \frac{3}{16}[\mu - 1/2 + \gamma] - \gamma^3
+\end{split}
+\end{equation}
+
+FOC is:
+  
+\begin{equation}
+\begin{split}
+  3/16 - 3\gamma^2  & = 0 \\
+  \gamma^2          & = \frac{1}{16} \\
+  \gamma            & = \frac{1}{4}
+\end{split}
+\end{equation}
+
+And therefore by Berk Theorem he learns the true state with probability 1.
+
+%\begin{equation}
 %\begin{split}
-  %\frac{\partial V_\gamma(\mu)}{\partial \gamma}(\gamma) & =
-    %(2\mu -1)\left[
-  %P_\gamma(1)^{-1} 
-    %[(1/2 + \gamma)\mu u(a_1^*, 1) + \gamma(2\mu - 2)\mu u(a_1^*, -1)] \\
-  %P_\gamma(0)^{-1} 
-    %[(1/2 - \gamma)\mu u(a_0^*, 1) - \gamma(2\mu - 2)\mu u(a_0^*, -1)] \\
-
-
-
-    %\frac{\partial V(\mu_\gamma(1))}{\partial \gamma}(1/2 + \gamma(2\mu - 1)) - \\
-    %& \qquad\quad
-    %\frac{\partial V(\mu_\gamma(0))}{\partial \gamma}(1/2 - \gamma(2\mu - 1)) \\
+  %E(u(a,\theta) | \mu) - \gamma^3 & = \\
+  %= & P(y = 1 |\mu, \gamma)\max\{\mathbb{E}(u(1,\theta) | \mu_\gamma(1)), 0\} + \\
+    %&\qquad P(y = 0 |\mu, \gamma)\max\{\mathbb{E}(u(1,\theta) | \mu_\gamma(0)), 0\} \\
+  %= & [\mu(1/2 + \gamma) + (1 - \mu)(1/2 -\gamma)] \frac{3}{16}
+      %\frac{\mu - 1/2 + \gamma}{1/2 + 2\gamma\mu - \gamma} \\
+    %&\qquad [\mu(1/2 - \gamma) + (1 - \mu)(1/2 + \gamma)] \frac{3}{16}
+      %\frac{\mu - 1/2 - \gamma}{1/2 - 2\gamma\mu + \gamma} - \gamma^3  \\
+  %= & [1/2 + 2\gamma\mu - \gamma]\frac{3}{16}
+      %\frac{\mu - 1/2 + \gamma}{1/2 + 2\gamma\mu - \gamma} \\
+    %&\qquad [1/2 - 2\gamma\mu + \gamma]\frac{3}{16}
+      %\frac{\mu - 1/2 - \gamma}{1/2 - 2\gamma\mu + \gamma} - \gamma^3 \\
+  %= & \frac{3}{16}[\mu - 1/2 + \gamma + \mu - 1/2 -\gamma] - \gamma^3
 %\end{split}
-%\]
-
+%\end{equation}
+%2}}}
 
 %}}}
 
 %	PROBLEM 4 {{{
 %----------------------------------------------------------------------------------------
 
+\section{Question 4}%
+\label{sec:Question 4}
+
+\subsection{(a)} %{{{2
+
+\newcommand{\ydots}{y_1, \ldots, y_t}
+\renewcommand{\Pth}{P_\theta}
+\newcommand{\Pthp}{P_\theta'}
+\newcommand{\PHI}{\phi_{\theta', \theta}^t}
+\newcommand{\prodtau}{\prod_{\tau  = 1}^{t-1}}
+\newcommand{\sumtau}{\sum_{\tau  = 1}^{t-1}}
+\begin{equation}
+\begin{split}
+  \PHI(\ydots) & = \log \frac{\mu^t(\theta' | \ydots)}
+                   {\mu^t(\theta | \ydots)} \\
+               & = \log \frac{\mu(\theta')\Pthp(\ydots)}
+                   {\mu(\theta)\Pth(\ydots)}
+\end{split}
+\end{equation}
+
+\begin{equation}
+\begin{split}
+  \Pth(\ydots)     & = \pi_0(y_1) \prodtau \Pth(y_{t+1} |y_t) \\
+  \PHI(\ydots)     & = \log \frac{\mu(\theta')}{\mu(\theta)} + \sumtau
+                       \log \frac{\Pthp(y_{t+1}|y_t)}{\Pth(y_{t+1}|y_t)} \\
+   \sumtau \log \frac{\Pthp(y_{t+1}|y_t)}{\Pth(y_{t+1}|y_t)} & =
+                       \sum_{y, y'} (t+1) \rho_{y, y'}(\ydots)
+                       \log \frac{\Pthp(y'|y)}{\Pth(y'|y)}
+\end{split}
+\end{equation}
+
+But since $\rho_{y, y'}(\ydots) = \rho_{y, y'}(y_1', \ldots, y_t')$ we
+have $\mu(\theta| \ydots) = \mu(\theta | y_1', \ldots, y_t') 
+\forall\ \theta \in \Theta$.
+%2}}}
+
+\subsection{(b)} %{{{2
+
+\begin{equation}
+\begin{split}
+  \rho_{y,y'}(\ydots) \xrightarrow{P} \theta^*(y, y') & =
+                     \pi^*(y) P_{\theta^*}(y'|y) \\
+  \PHI(\ydots) = \log \frac{\mu(\theta')}{\mu(\theta)} +
+      \sum_{y, y'}(t-1) P_{y, y'} \log \frac{P_}{}
+\end{split}
+\end{equation}
+%2}}}
+%}}}
+
+%	PROBLEM 5 {{{
+%----------------------------------------------------------------------------------------
+
+\section{Question 5}%
+\label{sec:Question 5}
+
+\subsection{(a)} %{{{2
+
+I assume that $y^1, y^2 \in \{0, 1\}$.
+
+Even though the agent don't observe $y^1$ and $y^2$ directly they can be inferred
+from the overall payoff. Since $y^1, y^2 \in \{0, 1\}$, the overall payoff has 4 
+possible values: $\{1, \alpha, (1-\alpha), 0\}$ which one of them directly
+specify one of the 4 possible states realizations, that is, respectively.
+$\{(y^1 = 1, y^2 = 1), (y^1 = 1, y^2 = 0), (y^1 = 0, y^2 = 1),(y^1 = 0, y^2 = 0)\}$.
+However, there are important exceptions, when $\alpha = 1/2$ differentiate between cases
+2 and 3, when $\alpha = 1$ we don't observe $y^2$ and when $\alpha = 0$ we don't
+observe $y^1$
+
+Let $y$ denote the overall payoff, we have the follow rule:
+
+\begin{equation}
+\begin{split}
+P(\theta = 1 | y = 1) & = \frac{P(y = 1| \theta = 1) \mu}{P(y = 1)} \\
+                      & = \frac{P(y^1 = 1, y^2 = 1 | \theta = 1)\mu}{P(y^1, y^2=1)} \\
+                      & = \frac{3/4*1/4\mu}{(3/4)(1/4)\mu + (1/4)(3/4)(1 - \mu)} \\
+                      & = \frac{3/16\mu}{3/16} \\
+                      & = \mu \\
+\text{Similarly:}     & \\
+P(\theta = 1|y=\alpha)& = \frac{9\mu}{8\mu + 1} \\
+P(\theta=1|y=1-\alpha)& = \frac{\mu}{9 - 8\mu} \\
+P(\theta = 1| y = 0)  & = \mu \\
+\text{But, if $\alpha = 1/2$ we have:} \\
+P(\theta = 1|y = 1/2) & = \frac{[P(y^1 = 1, y^0 = 0 | \theta = 1) +
+                                P(y^1 = 0, y^0 = 1 | \theta = 1)]\mu}
+                               {P(y^1 = 1, y^0 = 0) + P(y^1 = 1, y^0 = 0} \\
+                      & = \frac{10\mu}{(1 + 2\mu)^2 + (3 - 2\mu)^2} \\
+\text{Finally, and most importantly, if $\alpha = 1$: } & \\
+P(\theta = 1|y = 1)   & = \frac{3\mu}{1 + 2\mu} \\
+P(\theta = 1|y = 0)   & = \frac{\mu}{1 - 2\mu} \\
+\text{symmetrically, if $\alpha = 0$: } & \\
+P(\theta = 1|y = 1)   & = \frac{\mu}{1 - 2\mu} \\
+P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu}
+\end{split}
+\end{equation}
+
+The agent choose alpha to maximize:
+
+\begin{equation}
+  \max_{\alpha \in [0,1]} \alpha\mathbb{E}(y^1) + (1 - \alpha)\mathbb{E}(y^2) \\
+  \max_{\alpha \in [0,1]} \alpha(1/2\mu + 1/4) + (1 - \alpha)(3/4 - 1/2\mu) \\
+  \max_{\alpha \in [0,1]} \alpha(\mu - 1/2) + (3/4 - 1/2\mu)
+\end{equation}
+
+So it is clears that as long as $\mu > 1/2$ the best choice is $\alpha = 1$,
+and as long as $\mu < 1/2$ the best choice is $\alpha = 0$, is $\mu = 1/2$,
+the agent is indifferent between all $\alpha$.
+
+With $\alpha = 1$ there is only two outcomes and updating rules. We can now use
+the same method as Q1, defining $s_t$ as the difference between the number of
+positive outcomes and the number of negative outcomes. And $\Pn(s)$ as the probability
+of playing $\alpha$ forever at state $s$.
+
+As before, since $\mu \to 1$ as $s \to \infty$ we have that $\Pn(\infty) = 1$.
+Therefore we can use exactly the same argument as Q1 to prove that $\Pn(0) > 0$.
+
+%\begin{equation}
+%\begin{split}
+  %\Pn(0)           & \ge \frac{3}{4}P(1) \\
+                   %& = \frac{3}{4}(\frac{3}{4}\Pn(2) + \frac{1}{4}\Pn(0)) \\
+  %\Pn(1)           & \le \frac{4}{3}\Pn(0)\\
+  %\Pn(2)           & \le \frac{13}{9}\Pn(0)\\
+  %\Pn(n+1)-\frac{1}{3}\Pn(n)& = \Pn(n) - \frac{1}{3}\Pn(n - 1) \\
+                   %& = \Pn(2) - \frac{1}{3}\Pn(1) \\
+                   %& \le \frac{13}{9}\Pn(0) - \frac{1}{3}\frac{4}{3}\Pn(0)) \\
+  %\Pn(0)           & \ge \Pn(n+1) - \frac{1}{3}\Pn(n) \\
+  %\Pn(0)           & \ge \frac{2}{3}\Pn(\infty) \\
+  %\Pn(0)           & \ge \frac{2}{3}
+%\end{split}
+%\end{equation}
+
+% 2}}}
+
+%\subsection{(b)} %{{{2
+
+%Our updates changes to:
+
+%\begin{equation}
+ %\begin{split}
+   %\text{if $\alpha = 1$: } & \\
+   %P(\theta = 1|y = 1)   & = \frac{\mu}{1 - 2\mu} \\
+   %P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu} \\
+   %\text{symmetrically, if $\alpha = 0$: } & \\
+   %P(\theta = 1|y = 1)   & = \frac{3\mu}{1 + 2\mu} \\
+   %P(\theta = 1|y = 0)   & = \frac{\mu}{1 - 2\mu}
+ %\end{split} 
+%\end{equation}
+
+%Which is the opposite of before, as expected. The consequence of this is that
+%the agent updates $\mu$ in the wrong direction given each signal.
+% 2}}}
 % }}}
 \end{document}
