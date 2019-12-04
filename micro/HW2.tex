@@ -84,7 +84,7 @@ $\mu' = 1 \forall a,y$, therefore:
 \]
 
 Since $V$ is weakly increasing that must be $\mu^* \ge 0$ such that for for all 
-$0 \ge \mu < \mu^*, V(\mu) = 0$, and for all $1 \ge \mu > \mu, V(\mu) > 0$.
+$0 \le \mu < \mu^*, V(\mu) = 0$, and for all $1 \ge \mu > \mu, V(\mu) > 0$.
 
 Moreover, $0 \le \mu < \mu^*$, optimal $a$ is $0$ and for $\mu^* < \mu \le 1$, 
 optimal $a$ is $1$. Since $V^*$ is continuous at $\mu^*$ the agent is indifferent.
@@ -549,7 +549,7 @@ have $\mu(\theta| \ydots) = \mu(\theta | y_1', \ldots, y_t')
   \rho_{y,y'}(\ydots) \xrightarrow{P} \theta^*(y, y') & =
                      \pi^*(y) P_{\theta^*}(y'|y) \\
   \PHI(\ydots) = \log \frac{\mu(\theta')}{\mu(\theta)} +
-      \sum_{y, y'}(t-1) P_{y, y'} \log \frac{P_}{}
+      \sum_{y, y'}(t-1) P_{y, y'} \log \frac{}{}
 \end{split}
 \end{equation}
 %2}}}
@@ -604,9 +604,11 @@ P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu}
 The agent choose alpha to maximize:
 
 \begin{equation}
+\begin{split}
   \max_{\alpha \in [0,1]} \alpha\mathbb{E}(y^1) + (1 - \alpha)\mathbb{E}(y^2) \\
   \max_{\alpha \in [0,1]} \alpha(1/2\mu + 1/4) + (1 - \alpha)(3/4 - 1/2\mu) \\
   \max_{\alpha \in [0,1]} \alpha(\mu - 1/2) + (3/4 - 1/2\mu)
+\end{split}
 \end{equation}
 
 So it is clears that as long as $\mu > 1/2$ the best choice is $\alpha = 1$,
