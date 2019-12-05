@@ -591,16 +591,52 @@ $\PHI \to \infty$ which implies that $\mu(\Theta^* | \ydots) \xrightarrow{P} 1$
 
 I assume that $y^1, y^2 \in \{0, 1\}$.
 
-Even though the agent don't observe $y^1$ and $y^2$ directly they can be inferred
-from the overall payoff. Since $y^1, y^2 \in \{0, 1\}$, the overall payoff has 4 
-possible values: $\{1, \alpha, (1-\alpha), 0\}$ which one of them directly
-specify one of the 4 possible states realizations, that is, respectively.
-$\{(y^1 = 1, y^2 = 1), (y^1 = 1, y^2 = 0), (y^1 = 0, y^2 = 1),(y^1 = 0, y^2 = 0)\}$.
-However, there are important exceptions, when $\alpha = 1/2$ differentiate between cases
-2 and 3, when $\alpha = 1$ we don't observe $y^2$ and when $\alpha = 0$ we don't
-observe $y^1$
+The agent choose alpha to maximize:
 
-Let $y$ denote the overall payoff, we have the follow rule:
+\begin{equation}
+\begin{split}
+  \max_{\alpha \in [0,1]} \alpha\mathbb{E}(y^1) + (1 - \alpha)\mathbb{E}(y^2) \\
+  \max_{\alpha \in [0,1]} \alpha(1/2\mu + 1/4) + (1 - \alpha)(3/4 - 1/2\mu) \\
+  \max_{\alpha \in [0,1]} \alpha(\mu - 1/2) + (3/4 - 1/2\mu)
+\end{split}
+\end{equation}
+
+So it is clears that as long as $\mu > 1/2$ the best choice is $\alpha = 1$,
+and as long as $\mu < 1/2$ the best choice is $\alpha = 0$, is $\mu = 1/2$,
+the agent is indifferent between all $\alpha$.
+
+Let $y$ denote the overall payoff, we have the following updating rules,
+for the relevant $\alpha$:
+
+\begin{equation}
+\begin{split}
+  \text{For $\alpha = 1$:} \\
+  P(\theta = 1|y = 1)   & = \frac{3\mu}{1 + 2\mu} \\
+  P(\theta = 1|y = 0)   & = \frac{\mu}{3 - 2\mu} \\
+  \text{symmetrically, if $\alpha = 0$: } & \\
+  P(\theta = 1|y = 1)   & = \frac{\mu}{3 - 2\mu} \\
+  P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu}
+\end{split}
+\end{equation}
+
+With $\alpha = 1$ there is only two outcomes and updating rules. We can now define
+$s_t$ as the difference between the number of positive outcomes and the number
+of negative outcomes. And $\Pn(s)$ as the probability of playing $\alpha$
+forever at state $s$.
+
+As before, since $\mu \to 1$ as $s \to \infty$ we have that $\Pn(\infty) = 1$.
+Therefore we can use exactly the same argument as Q1 to prove that $\Pn(0) > 0$.
+
+%Even though the agent don't observe $y^1$ and $y^2$ directly they can be inferred
+%from the overall payoff. Since $y^1, y^2 \in \{0, 1\}$, the overall payoff has 4 
+%possible values: $\{1, \alpha, (1-\alpha), 0\}$ which one of them directly
+%specify one of the 4 possible states realizations, that is, respectively.
+%$\{(y^1 = 1, y^2 = 1), (y^1 = 1, y^2 = 0), (y^1 = 0, y^2 = 1),(y^1 = 0, y^2 = 0)\}$.
+%However, there are important exceptions, when $\alpha = 1/2$ differentiate between cases
+%2 and 3, when $\alpha = 1$ we don't observe $y^2$ and when $\alpha = 0$ we don't
+%observe $y^1$
+
+As an addendum, this are all the updating rules:
 
 \begin{equation}
 \begin{split}
@@ -618,36 +654,10 @@ P(\theta = 1|y = 1/2) & = \frac{[P(y^1 = 1, y^0 = 0 | \theta = 1) +
                                 P(y^1 = 0, y^0 = 1 | \theta = 1)]\mu}
                                {P(y^1 = 1, y^0 = 0) + P(y^1 = 1, y^0 = 0} \\
                       & = \frac{10\mu}{(1 + 2\mu)^2 + (3 - 2\mu)^2} \\
-\text{Finally, and most importantly, if $\alpha = 1$: } & \\
-P(\theta = 1|y = 1)   & = \frac{3\mu}{1 + 2\mu} \\
-P(\theta = 1|y = 0)   & = \frac{\mu}{3 - 2\mu} \\
-\text{symmetrically, if $\alpha = 0$: } & \\
-P(\theta = 1|y = 1)   & = \frac{\mu}{3 - 2\mu} \\
-P(\theta = 1|y = 0)   & = \frac{3\mu}{1 + 2\mu}
 \end{split}
 \end{equation}
 
-The agent choose alpha to maximize:
 
-\begin{equation}
-\begin{split}
-  \max_{\alpha \in [0,1]} \alpha\mathbb{E}(y^1) + (1 - \alpha)\mathbb{E}(y^2) \\
-  \max_{\alpha \in [0,1]} \alpha(1/2\mu + 1/4) + (1 - \alpha)(3/4 - 1/2\mu) \\
-  \max_{\alpha \in [0,1]} \alpha(\mu - 1/2) + (3/4 - 1/2\mu)
-\end{split}
-\end{equation}
-
-So it is clears that as long as $\mu > 1/2$ the best choice is $\alpha = 1$,
-and as long as $\mu < 1/2$ the best choice is $\alpha = 0$, is $\mu = 1/2$,
-the agent is indifferent between all $\alpha$.
-
-With $\alpha = 1$ there is only two outcomes and updating rules. We can now use
-the same method as Q1, defining $s_t$ as the difference between the number of
-positive outcomes and the number of negative outcomes. And $\Pn(s)$ as the probability
-of playing $\alpha$ forever at state $s$.
-
-As before, since $\mu \to 1$ as $s \to \infty$ we have that $\Pn(\infty) = 1$.
-Therefore we can use exactly the same argument as Q1 to prove that $\Pn(0) > 0$.
 
 %\begin{equation}
 %\begin{split}
